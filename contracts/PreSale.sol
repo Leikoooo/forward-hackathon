@@ -12,11 +12,7 @@ contract PreSale {
 
     // users methods
     event Pledge(address indexed caller, uint256 amount);
-    event Unpledge(address indexed caller, uint256 amount); 
-    event GetGoal(uint256 goal);
-    event GetSumDeposit(uint256 amount);
-    event GetAmountDeposit(uint256 amount);
-
+    event Unpledge(address indexed caller, uint256 amount);
 
     struct Campaign {
         // Creator of campaign
@@ -33,7 +29,10 @@ contract PreSale {
         bool campaignIsOver;
     }
 
+    // The coin in which we receive money
     IERC20 public immutable depositUSDT;
+
+    // The address of the coin that will be distributed
     IERC20 public immutable preSaleToken;
 
     mapping(address => uint256) public pledgedAmount;
@@ -67,16 +66,31 @@ contract PreSale {
     function pledge(uint256 _amount) external {
         require(block.timestamp >= campaingData.startAt, "not started");
         require(block.timestamp <= campaingData.endAt, "ended");
+        require(!campaingData.claimed, "campaign completed");
+        require(_amount > 0, "amount <= 0");
 
+        // check if user has enough balance
+        require(
+            depositUSDT.balanceOf(msg.sender) >= _amount,
+            "insufficient balance"
+        );
+
+        depositUSDT.transferFrom(msg.sender, address(this), _amount);
         campaingData.pledged += _amount;
         pledgedAmount[msg.sender] += _amount;
-        depositUSDT.transferFrom(msg.sender, address(this), _amount);
+
+        if (campaingData.pledged >= campaingData.goal) {
+            campaingData.claimed = true;
+        }
 
         emit Pledge(msg.sender, _amount);
     }
 
     function unpledge(uint256 _amount) external {
         require(block.timestamp <= campaingData.endAt, "ended");
+        require(!campaingData.claimed, "Already claimed");
+        require(pledgedAmount[msg.sender] >= _amount, "insufficient balance");
+        require(_amount > 0, "amount <= 0");
 
         campaingData.pledged -= _amount;
         pledgedAmount[msg.sender] -= _amount;
@@ -86,20 +100,28 @@ contract PreSale {
     }
 
     function claim() external {
-
         require(campaingData.creator == msg.sender, "not creator");
-        require(block.timestamp > campaingData.endAt, "not ended");
-        require(campaingData.pledged >= campaingData.goal, "pledged < goal");
-        require(!campaingData.claimed, "claimed");
+        require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
 
         campaingData.claimed = true;
         depositUSDT.transfer(campaingData.creator, campaingData.pledged);
+
+        // refund tokens to users who payed
+        for (uint256 i = 0; i < pledgedAmount.length(); i++) { 
+            address userAddress = pledgedAmount.getKeyAtIndex(i);
+            uint256 coeff = (campaingData.pledged / campaingData.goal) <= 1
+                ? (campaingData.pledged / campaingData.goal)
+                : 1;
+            uint256 refundAmounts = pledgedAmount[userAddress] * coeff;
+
+            pledgedAmount[userAddress] = 0;
+            preSaleToken.transfer(userAddress, refundAmounts);
+        }
 
         emit Claim();
     }
 
     function refund() external {
-
         require(block.timestamp > campaingData.endAt, "not ended");
         require(campaingData.pledged < campaingData.goal, "pledged >= goal");
 
@@ -110,15 +132,15 @@ contract PreSale {
         emit Refund(msg.sender, bal);
     }
 
-    function getGoal() external {
-        emit GetGoal(campaingData.goal);
+    function getGoal() external view returns (uint256) {
+        return campaingData.goal;
     }
 
-    function getSumDeposit() external {
-        emit GetSumDeposit(campaingData.pledged);
+    function getSumDeposit() external view returns (uint256) {
+        return campaingData.pledged;
     }
 
-    function getAmountDeposit() external {
-        emit GetAmountDeposit(pledgedAmount[msg.sender]);
+    function getUserDeposit() external view returns (uint256) {
+        return pledgedAmount[msg.sender];
     }
 }
