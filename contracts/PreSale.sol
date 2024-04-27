@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.9.0;
+pragma solidity ^0.8.20;
 
-interface IERC20 {
-    function transfer(address, uint256) external returns (bool);
-    function transferFrom(address, address, uint256) external returns (bool);
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract PreSale {
     event Launch(
@@ -81,17 +78,27 @@ contract PreSale {
     function pledge(uint256 _amount) external {
         require(block.timestamp >= campaingData.startAt, "not started");
         require(block.timestamp <= campaingData.endAt, "ended");
+        require(!campaingData.claimed, "campaign completed");
+        require(_amount > 0, "amount <= 0");
 
+        // check if user has enough balance
+        require(depositUSDT.balanceOf(msg.sender) >= _amount, "insufficient balance");
+
+        depositUSDT.transferFrom(msg.sender, address(this), _amount);
         campaingData.pledged += _amount;
         pledgedAmount[msg.sender] += _amount;
-        depositUSDT.transferFrom(msg.sender, address(this), _amount);
+
+        if (campaingData.pledged >= campaingData.goal) {
+            campaingData.claimed = true;
+        }
 
         emit Pledge(msg.sender, _amount);
     }
 
     function unpledge(uint256 _amount) external {
         require(block.timestamp <= campaingData.endAt, "ended");
-
+        require(!campaingData.claimed, "Already claimed");
+        
         campaingData.pledged -= _amount;
         pledgedAmount[msg.sender] -= _amount;
         depositUSDT.transfer(msg.sender, _amount);
