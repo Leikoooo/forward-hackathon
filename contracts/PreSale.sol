@@ -26,7 +26,7 @@ contract PreSale {
         // Timestamp of end of campaign
         uint32 endAt;
         // True if campaign is over (goal completed or time is out)
-        bool campaignIsOver;
+        bool campaingIsOver;
     }
 
     // The coin in which we receive money
@@ -36,7 +36,7 @@ contract PreSale {
     IERC20 public immutable preSaleToken;
 
     mapping(address => uint256) public pledgedAmount;
-    Campaign public campaignData;
+    Campaign public campaingData;
 
     constructor(address _preSaleToken, uint256 _goal, uint32 _startAt, uint32 _endAt) {
         require(_startAt >= block.timestamp, "start at < now");
@@ -45,28 +45,28 @@ contract PreSale {
 
         depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
         preSaleToken = IERC20(_preSaleToken);
-        campaignData = Campaign({
+        campaingData = Campaign({
             creator: msg.sender,
             goal: _goal,
             pledged: 0,
             startAt: _startAt,
             endAt: _endAt,
-            campaignIsOver: false
+            campaingIsOver: false
         });
     }
 
 
-    function cancel() external {
-        require(campaingData.creator == msg.sender, "not creator");
-        require(block.timestamp < campaingData.startAt, "started");
-
-        emit Cancel();
-    }
+    //function cancel() external {
+    //    require(campaingData.creator == msg.sender, "not creator");
+    //    require(block.timestamp < campaingData.startAt, "started");
+    //
+    //    emit Cancel();
+    //}
 
     function pledge(uint256 _amount) external {
         require(block.timestamp >= campaingData.startAt, "not started");
         require(block.timestamp <= campaingData.endAt, "ended");
-        require(!campaingData.claimed, "campaign completed");
+        require(!campaingData., "campaing completed");
         require(_amount > 0, "amount <= 0");
 
         // check if user has enough balance
@@ -98,12 +98,12 @@ contract PreSale {
 
         emit Unpledge(msg.sender, _amount);
     }
-
-    function claim() external {
-        require(campaingData.creator == msg.sender, "not creator");
+    
+    function claim() external onlyOwner{
+        
         require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
 
-        campaingData.claimed = true;
+        campaingData.campaingIsOver = true;
         depositUSDT.transfer(campaingData.creator, campaingData.pledged);
 
         // refund tokens to users who payed
