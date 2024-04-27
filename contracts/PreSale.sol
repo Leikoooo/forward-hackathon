@@ -50,7 +50,7 @@ contract PreSale {
     Campaign public campaingData;
 
     constructor(address _preSaleToken) {
-        depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
+        depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F); // USDT
         preSaleToken = IERC20(_preSaleToken);
     }
 
@@ -113,7 +113,6 @@ contract PreSale {
     }
 
     function refund() external {
-
         require(block.timestamp > campaingData.endAt, "not ended");
         require(campaingData.pledged < campaingData.goal, "pledged >= goal");
 
@@ -124,15 +123,15 @@ contract PreSale {
         emit Refund(msg.sender, bal);
     }
 
-    function getGoal() external {
-        emit GetGoal(campaingData.goal);
+    function getGoal() external view returns (uint256) {
+        return campaingData.goal;
     }
 
-    function getSumDeposit() external {
-        emit GetSumDeposit(campaingData.pledged);
+    function getSumDeposit() external view returns (uint256){
+        return campaingData.pledged;
     }
 
-    function getAmountDeposit() external {
-        emit GetAmountDeposit(pledgedAmount[msg.sender]);
+    function getAmountDeposit() external view returns (uint256) {
+        return pledgedAmount[msg.sender];
     }
 }
