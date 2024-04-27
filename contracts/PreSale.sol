@@ -18,11 +18,7 @@ contract PreSale {
 
     // users methods
     event Pledge(address indexed caller, uint256 amount);
-    event Unpledge(address indexed caller, uint256 amount); 
-    event GetGoal(uint256 goal);
-    event GetSumDeposit(uint256 amount);
-    event GetAmountDeposit(uint256 amount);
-
+    event Unpledge(address indexed caller, uint256 amount);
 
     struct Campaign {
         // Creator of campaign
@@ -44,7 +40,7 @@ contract PreSale {
 
     // The address of the coin that will be distributed
     IERC20 public immutable preSaleToken;
-    
+
     // Mapping from campaign id => pledger => amount pledged
     mapping(address => uint256) public pledgedAmount;
     Campaign public campaingData;
@@ -85,7 +81,10 @@ contract PreSale {
         require(_amount > 0, "amount <= 0");
 
         // check if user has enough balance
-        require(depositUSDT.balanceOf(msg.sender) >= _amount, "insufficient balance");
+        require(
+            depositUSDT.balanceOf(msg.sender) >= _amount,
+            "insufficient balance"
+        );
 
         depositUSDT.transferFrom(msg.sender, address(this), _amount);
         campaingData.pledged += _amount;
@@ -101,6 +100,8 @@ contract PreSale {
     function unpledge(uint256 _amount) external {
         require(block.timestamp <= campaingData.endAt, "ended");
         require(!campaingData.claimed, "Already claimed");
+        require(pledgedAmount[msg.sender] >= _amount, "insufficient balance");
+        require(_amount > 0, "amount <= 0");
         
         campaingData.pledged -= _amount;
         pledgedAmount[msg.sender] -= _amount;
@@ -110,7 +111,6 @@ contract PreSale {
     }
 
     function claim() external {
-
         require(campaingData.creator == msg.sender, "not creator");
         require(block.timestamp > campaingData.endAt, "not ended");
         require(campaingData.pledged >= campaingData.goal, "pledged < goal");
@@ -137,11 +137,11 @@ contract PreSale {
         return campaingData.goal;
     }
 
-    function getSumDeposit() external view returns (uint256){
+    function getSumDeposit() external view returns (uint256) {
         return campaingData.pledged;
     }
 
-    function getAmountDeposit() external view returns (uint256) {
+    function getUserDeposit() external view returns (uint256) {
         return pledgedAmount[msg.sender];
     }
 }
