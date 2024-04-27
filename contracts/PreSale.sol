@@ -23,7 +23,7 @@ contract PreSale {
     event Pledge(address indexed caller, uint256 amount);
     event Unpledge(address indexed caller, uint256 amount); 
     event GetPool();
-    event GetAmountDeposit(address indexed caller);
+    event GetAmountDeposit(uint256 amount);
 
     struct Campaign {
         // Creator of campaign
@@ -118,5 +118,11 @@ contract PreSale {
         preSaleToken.transfer(msg.sender, bal);
 
         emit Refund(msg.sender, bal);
+    }
+
+    function getAmountDeposit() external {
+
+        uint256 wasPledged = pledgedAmount[msg.sender];
+        emit GetAmountDeposit(wasPledged);
     }
 }
