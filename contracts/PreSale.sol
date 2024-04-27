@@ -110,14 +110,8 @@ contract PreSale {
         emit Unpledge(msg.sender, _amount);
     }
 
-    function claim() external {
-        require(campaingData.creator == msg.sender, "not creator");
-        require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
-
-        campaingData.claimed = true;
-        depositUSDT.transfer(campaingData.creator, campaingData.pledged);
-
-        // refund tokens to users who payed
+    function awardPreSaleToken() private {
+        // award presale tokens to users who payed
         for (uint256 i = 0; i < pledgedAmount.length(); i++) { 
             address userAddress = pledgedAmount.getKeyAtIndex(i);
             uint256 coeff = (campaingData.pledged / campaingData.goal) <= 1
@@ -128,6 +122,15 @@ contract PreSale {
             pledgedAmount[userAddress] = 0;
             preSaleToken.transfer(userAddress, refundAmounts);
         }
+    }
+
+    function claim() external {
+        require(campaingData.creator == msg.sender, "not creator");
+        require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
+
+        campaingData.claimed = true;
+        depositUSDT.transfer(campaingData.creator, campaingData.pledged);
+        awardPreSaleToken(); // call private function to award presale tokens
 
         emit Claim();
     }
