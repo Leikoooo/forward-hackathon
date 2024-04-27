@@ -22,9 +22,10 @@ contract PreSale {
     event Refund(uint256 id, address indexed caller, uint256 amount);
 
     // users methods
-    event Pledge(uint256 indexed id, address indexed caller, uint256 amount);
-    event Unpledge(uint256 indexed id, address indexed caller, uint256 amount); 
-
+    event Pledge(address indexed caller, uint256 amount);
+    event Unpledge(address indexed caller, uint256 amount); 
+    event GetPool();
+    event GetAmountDeposit(address indexed caller);
 
     struct Campaign {
         // Creator of campaign
@@ -42,13 +43,8 @@ contract PreSale {
     }
 
     IERC20 public immutable preSaleToken;
-    // Total count of campaigns created.
-    // It is also used to generate id for new campaigns.
-    uint256 public count;
-    // Mapping from id to Campaign
-    mapping(uint256 => Campaign) public campaigns;
     // Mapping from campaign id => pledger => amount pledged
-    mapping(uint256 => mapping(address => uint256)) public pledgedAmount;
+    mapping(address => uint256) public pledgedAmount;
 
     constructor(address _preSaleToken) {
         preSaleToken = IERC20(_preSaleToken);
