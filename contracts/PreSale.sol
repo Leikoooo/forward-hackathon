@@ -39,12 +39,12 @@ contract PreSale is Ownable {
     Campaign public campaingData;
 
     constructor(address _preSaleToken, uint256 _goal, uint32 _startAt, uint32 _endAt, address _owner) Ownable(_owner)  {
-        require(_startAt >= block.timestamp, "start at < now");
+        // require(_startAt >= block.timestamp, "start at < now");
         require(_endAt >= _startAt, "end at < start at");
         require(_endAt <= block.timestamp + 90 days, "end at > max duration");
 
         depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
-        preSaleToken = IERC20(_preSaleToken);
+        preSaleToken = IERC20(_preSaleToken); // token which will be distributed
         campaingData = Campaign({
             creator: msg.sender,
             goal: _goal,
@@ -69,13 +69,8 @@ contract PreSale is Ownable {
         require(!campaingData.campaingIsOver, "campaing completed");
         require(_amount > 0, "amount <= 0");
 
-        // check if user has enough balance
-        require(
-            depositUSDT.balanceOf(msg.sender) >= _amount,
-            "insufficient balance"
-        );
-
-        depositUSDT.transferFrom(msg.sender, address(this), _amount);
+        bool result = depositUSDT.transferFrom(msg.sender, address(this), _amount);
+        require(result, "transfer failed");
         campaingData.pledged += _amount;
         pledgedAmount[msg.sender] += _amount;
 
