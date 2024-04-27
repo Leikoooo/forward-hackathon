@@ -42,12 +42,15 @@ contract PreSale {
         bool claimed;
     }
 
+    IERC20 public immutable depositUSDT;
     IERC20 public immutable preSaleToken;
+    
     // Mapping from campaign id => pledger => amount pledged
     mapping(address => uint256) public pledgedAmount;
     Campaign public campaingData;
 
     constructor(address _preSaleToken) {
+        depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
         preSaleToken = IERC20(_preSaleToken);
     }
 
@@ -81,7 +84,7 @@ contract PreSale {
 
         campaingData.pledged += _amount;
         pledgedAmount[msg.sender] += _amount;
-        preSaleToken.transferFrom(msg.sender, address(this), _amount);
+        depositUSDT.transferFrom(msg.sender, address(this), _amount);
 
         emit Pledge(msg.sender, _amount);
     }
@@ -91,7 +94,7 @@ contract PreSale {
 
         campaingData.pledged -= _amount;
         pledgedAmount[msg.sender] -= _amount;
-        preSaleToken.transfer(msg.sender, _amount);
+        depositUSDT.transfer(msg.sender, _amount);
 
         emit Unpledge(msg.sender, _amount);
     }
@@ -104,7 +107,7 @@ contract PreSale {
         require(!campaingData.claimed, "claimed");
 
         campaingData.claimed = true;
-        preSaleToken.transfer(campaingData.creator, campaingData.pledged);
+        depositUSDT.transfer(campaingData.creator, campaingData.pledged);
 
         emit Claim();
     }
@@ -116,7 +119,7 @@ contract PreSale {
 
         uint256 bal = pledgedAmount[msg.sender];
         pledgedAmount[msg.sender] = 0;
-        preSaleToken.transfer(msg.sender, bal);
+        depositUSDT.transfer(msg.sender, bal);
 
         emit Refund(msg.sender, bal);
     }
