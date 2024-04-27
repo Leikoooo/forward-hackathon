@@ -3,13 +3,13 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.7.0",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
-    }
+    version: '0.8.20',
+  },  
+  networks: {
+    hardhat: {},
+  },
+  paths: {
+    artifacts: './artifacts',
   },
 };
 
