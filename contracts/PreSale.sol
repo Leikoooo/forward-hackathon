@@ -23,7 +23,7 @@ contract PreSale {
 
     // users methods
     event Pledge(uint256 indexed id, address indexed caller, uint256 amount);
-    // event Unpledge(uint256 indexed id, address indexed caller, uint256 amount); 
+    event Unpledge(uint256 indexed id, address indexed caller, uint256 amount); 
 
 
     struct Campaign {
@@ -50,8 +50,8 @@ contract PreSale {
     // Mapping from campaign id => pledger => amount pledged
     mapping(uint256 => mapping(address => uint256)) public pledgedAmount;
 
-    constructor(address _preSaleToken, ) {
-        preSaleToken = address(_preSaleToken);
+    constructor(address _preSaleToken) {
+        preSaleToken = IERC20(_preSaleToken);
     }
 
     function launch(uint256 _goal, uint32 _startAt, uint32 _endAt) external {
@@ -88,7 +88,7 @@ contract PreSale {
 
         campaign.pledged += _amount;
         pledgedAmount[_id][msg.sender] += _amount;
-        token.transferFrom(msg.sender, address(this), _amount);
+        preSaleToken.transferFrom(msg.sender, address(this), _amount);
 
         emit Pledge(_id, msg.sender, _amount);
     }
@@ -99,7 +99,7 @@ contract PreSale {
 
         campaign.pledged -= _amount;
         pledgedAmount[_id][msg.sender] -= _amount;
-        token.transfer(msg.sender, _amount);
+        preSaleToken.transfer(msg.sender, _amount);
 
         emit Unpledge(_id, msg.sender, _amount);
     }
@@ -112,7 +112,7 @@ contract PreSale {
         require(!campaign.claimed, "claimed");
 
         campaign.claimed = true;
-        token.transfer(campaign.creator, campaign.pledged);
+        preSaleToken.transfer(campaign.creator, campaign.pledged);
 
         emit Claim(_id);
     }
@@ -124,7 +124,7 @@ contract PreSale {
 
         uint256 bal = pledgedAmount[_id][msg.sender];
         pledgedAmount[_id][msg.sender] = 0;
-        token.transfer(msg.sender, bal);
+        preSaleToken.transfer(msg.sender, bal);
 
         emit Refund(_id, msg.sender, bal);
     }
