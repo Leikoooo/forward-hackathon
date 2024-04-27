@@ -102,7 +102,7 @@ contract PreSale {
         require(!campaingData.claimed, "Already claimed");
         require(pledgedAmount[msg.sender] >= _amount, "insufficient balance");
         require(_amount > 0, "amount <= 0");
-        
+
         campaingData.pledged -= _amount;
         pledgedAmount[msg.sender] -= _amount;
         depositUSDT.transfer(msg.sender, _amount);
@@ -112,12 +112,22 @@ contract PreSale {
 
     function claim() external {
         require(campaingData.creator == msg.sender, "not creator");
-        require(block.timestamp > campaingData.endAt, "not ended");
-        require(campaingData.pledged >= campaingData.goal, "pledged < goal");
-        require(!campaingData.claimed, "claimed");
+        require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
 
         campaingData.claimed = true;
         depositUSDT.transfer(campaingData.creator, campaingData.pledged);
+
+        // refund tokens to users who payed
+        for (uint256 i = 0; i < pledgedAmount.length(); i++) { 
+            address userAddress = pledgedAmount.getKeyAtIndex(i);
+            uint256 coeff = (campaingData.pledged / campaingData.goal) <= 1
+                ? (campaingData.pledged / campaingData.goal)
+                : 1;
+            uint256 refundAmounts = pledgedAmount[userAddress] * coeff;
+
+            pledgedAmount[userAddress] = 0;
+            preSaleToken.transfer(userAddress, refundAmounts);
+        }
 
         emit Claim();
     }
