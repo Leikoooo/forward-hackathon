@@ -1,19 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.9.0;
+pragma solidity ^0.8.20;
 
-interface IERC20 {
-    function transfer(address, uint256) external returns (bool);
-    function transferFrom(address, address, uint256) external returns (bool);
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract PreSale {
-    event Launch(
-        address indexed creator,
-        uint256 goal,
-        uint32 startAt,
-        uint32 endAt
-    );
-
     // admins methods
     event Cancel();
     event Claim();
@@ -38,38 +29,33 @@ contract PreSale {
         uint32 startAt;
         // Timestamp of end of campaign
         uint32 endAt;
-        // True if goal was reached and creator has claimed the tokens.
-        bool claimed;
+        // True if campaign is over (goal completed or time is out)
+        bool campaignIsOver;
     }
 
     IERC20 public immutable depositUSDT;
     IERC20 public immutable preSaleToken;
-    
-    // Mapping from campaign id => pledger => amount pledged
+
     mapping(address => uint256) public pledgedAmount;
-    Campaign public campaingData;
+    Campaign public campaignData;
 
-    constructor(address _preSaleToken) {
-        depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
-        preSaleToken = IERC20(_preSaleToken);
-    }
-
-    function launch(uint256 _goal, uint32 _startAt, uint32 _endAt) external {
+    constructor(address _preSaleToken, uint256 _goal, uint32 _startAt, uint32 _endAt) {
         require(_startAt >= block.timestamp, "start at < now");
         require(_endAt >= _startAt, "end at < start at");
         require(_endAt <= block.timestamp + 90 days, "end at > max duration");
 
-        campaingData = Campaign({
+        depositUSDT = IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F);
+        preSaleToken = IERC20(_preSaleToken);
+        campaignData = Campaign({
             creator: msg.sender,
             goal: _goal,
             pledged: 0,
             startAt: _startAt,
             endAt: _endAt,
-            claimed: false
+            campaignIsOver: false
         });
-
-        emit Launch(msg.sender, _goal, _startAt, _endAt);
     }
+
 
     function cancel() external {
         require(campaingData.creator == msg.sender, "not creator");
