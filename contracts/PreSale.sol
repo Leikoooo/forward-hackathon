@@ -42,7 +42,10 @@ contract PreSale {
         bool claimed;
     }
 
+    // The coin in which we receive money
     IERC20 public immutable depositUSDT;
+
+    // The address of the coin that will be distributed
     IERC20 public immutable preSaleToken;
     
     // Mapping from campaign id => pledger => amount pledged
