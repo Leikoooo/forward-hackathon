@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity >=0.6.0 <0.9.0;
 
 interface IERC20 {
     function transfer(address, uint256) external returns (bool);
     function transferFrom(address, address, uint256) external returns (bool);
 }
 
-contract CrowdFund {
+contract PreSale {
     event Launch(
         uint256 id,
         address indexed creator,
@@ -14,11 +14,17 @@ contract CrowdFund {
         uint32 startAt,
         uint32 endAt
     );
+
+
+    // admins methods
     event Cancel(uint256 id);
-    event Pledge(uint256 indexed id, address indexed caller, uint256 amount);
-    event Unpledge(uint256 indexed id, address indexed caller, uint256 amount);
     event Claim(uint256 id);
     event Refund(uint256 id, address indexed caller, uint256 amount);
+
+    // users methods
+    event Pledge(uint256 indexed id, address indexed caller, uint256 amount);
+    // event Unpledge(uint256 indexed id, address indexed caller, uint256 amount); 
+
 
     struct Campaign {
         // Creator of campaign
@@ -35,7 +41,7 @@ contract CrowdFund {
         bool claimed;
     }
 
-    IERC20 public immutable token;
+    IERC20 public immutable preSaleToken;
     // Total count of campaigns created.
     // It is also used to generate id for new campaigns.
     uint256 public count;
@@ -44,8 +50,8 @@ contract CrowdFund {
     // Mapping from campaign id => pledger => amount pledged
     mapping(uint256 => mapping(address => uint256)) public pledgedAmount;
 
-    constructor(address _token) {
-        token = IERC20(_token);
+    constructor(address _preSaleToken, ) {
+        preSaleToken = address(_preSaleToken);
     }
 
     function launch(uint256 _goal, uint32 _startAt, uint32 _endAt) external {
