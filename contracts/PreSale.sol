@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract PreSale {
+contract PreSale is Ownable {
     // admins methods
     event Cancel();
     event Claim();
@@ -38,7 +38,7 @@ contract PreSale {
     mapping(address => uint256) public pledgedAmount;
     Campaign public campaingData;
 
-    constructor(address _preSaleToken, uint256 _goal, uint32 _startAt, uint32 _endAt) {
+    constructor(address _preSaleToken, uint256 _goal, uint32 _startAt, uint32 _endAt, address _owner) Ownable(_owner)  {
         require(_startAt >= block.timestamp, "start at < now");
         require(_endAt >= _startAt, "end at < start at");
         require(_endAt <= block.timestamp + 90 days, "end at > max duration");
@@ -66,7 +66,7 @@ contract PreSale {
     function pledge(uint256 _amount) external {
         require(block.timestamp >= campaingData.startAt, "not started");
         require(block.timestamp <= campaingData.endAt, "ended");
-        require(!campaingData., "campaing completed");
+        require(!campaingData.campaingIsOver, "campaing completed");
         require(_amount > 0, "amount <= 0");
 
         // check if user has enough balance
@@ -80,7 +80,7 @@ contract PreSale {
         pledgedAmount[msg.sender] += _amount;
 
         if (campaingData.pledged >= campaingData.goal) {
-            campaingData.claimed = true;
+            campaingData.campaingIsOver = true;
         }
 
         emit Pledge(msg.sender, _amount);
@@ -88,7 +88,7 @@ contract PreSale {
 
     function unpledge(uint256 _amount) external {
         require(block.timestamp <= campaingData.endAt, "ended");
-        require(!campaingData.claimed, "Already claimed");
+        require(!campaingData.campaingIsOver, "Already claimed");
         require(pledgedAmount[msg.sender] >= _amount, "insufficient balance");
         require(_amount > 0, "amount <= 0");
 
@@ -101,34 +101,23 @@ contract PreSale {
 
     function awardPreSaleToken() private {
         // award presale tokens to users who payed
-    
-    function claim() external onlyOwner{
-        
-        require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
+        // for (uint256 i = 0; i < pledgedAmount.length; i++) { 
+        //     address userAddress = pledgedAmount.getKeyAtIndex(i);
+        //     uint256 coeff = (campaingData.pledged / campaingData.goal) <= 1
+        //         ? (campaingData.pledged / campaingData.goal)
+        //         : 1;
+        //     uint256 refundAmounts = pledgedAmount[userAddress] * coeff;
 
-        campaingData.campaingIsOver = true;
-        depositUSDT.transfer(campaingData.creator, campaingData.pledged);
-
-        // refund tokens to users who payed
-        for (uint256 i = 0; i < pledgedAmount.length(); i++) { 
-            address userAddress = pledgedAmount.getKeyAtIndex(i);
-            uint256 coeff = (campaingData.pledged / campaingData.goal) <= 1
-                ? (campaingData.pledged / campaingData.goal)
-                : 1;
-            uint256 refundAmounts = pledgedAmount[userAddress] * coeff;
-
-            pledgedAmount[userAddress] = 0;
-            preSaleToken.transfer(userAddress, refundAmounts);
-        }
+        //     pledgedAmount[userAddress] = 0;
+        //     preSaleToken.transfer(userAddress, refundAmounts);
+        // }
     }
 
-    function claim() external {
-        require(campaingData.creator == msg.sender, "not creator");
+    function claim() external onlyOwner{
         require((campaingData.pledged >= campaingData.goal || block.timestamp > campaingData.endAt), "presale not ended");
 
-        campaingData.claimed = true;
         depositUSDT.transfer(campaingData.creator, campaingData.pledged);
-        awardPreSaleToken(); // call private function to award presale tokens
+        awardPreSaleToken();
 
         emit Claim();
     }
