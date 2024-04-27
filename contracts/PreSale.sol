@@ -22,8 +22,10 @@ contract PreSale {
     // users methods
     event Pledge(address indexed caller, uint256 amount);
     event Unpledge(address indexed caller, uint256 amount); 
-    event GetPool();
-    event GetAmountDeposit(address indexed caller);
+    event GetGoal(uint256 goal);
+    event GetSumDeposit(uint256 amount);
+    event GetAmountDeposit(uint256 amount);
+
 
     struct Campaign {
         // Creator of campaign
@@ -44,7 +46,6 @@ contract PreSale {
     // Mapping from campaign id => pledger => amount pledged
     mapping(address => uint256) public pledgedAmount;
     Campaign public campaingData;
-
 
     constructor(address _preSaleToken) {
         preSaleToken = IERC20(_preSaleToken);
@@ -118,5 +119,13 @@ contract PreSale {
         preSaleToken.transfer(msg.sender, bal);
 
         emit Refund(msg.sender, bal);
+    }
+
+    function getGoal() external {
+        emit GetGoal(campaingData.goal);
+    }
+
+    function getSumDeposit() external {
+        emit GetSumDeposit(campaingData.pledged);
     }
 }
