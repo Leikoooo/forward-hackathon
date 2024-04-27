@@ -8,18 +8,16 @@ interface IERC20 {
 
 contract PreSale {
     event Launch(
-        uint256 id,
         address indexed creator,
         uint256 goal,
         uint32 startAt,
         uint32 endAt
     );
 
-
     // admins methods
-    event Cancel(uint256 id);
-    event Claim(uint256 id);
-    event Refund(uint256 id, address indexed caller, uint256 amount);
+    event Cancel();
+    event Claim();
+    event Refund(address indexed caller, uint256 amount);
 
     // users methods
     event Pledge(address indexed caller, uint256 amount);
@@ -45,6 +43,8 @@ contract PreSale {
     IERC20 public immutable preSaleToken;
     // Mapping from campaign id => pledger => amount pledged
     mapping(address => uint256) public pledgedAmount;
+    Campaign public campaingData;
+
 
     constructor(address _preSaleToken) {
         preSaleToken = IERC20(_preSaleToken);
@@ -55,8 +55,7 @@ contract PreSale {
         require(_endAt >= _startAt, "end at < start at");
         require(_endAt <= block.timestamp + 90 days, "end at > max duration");
 
-        count += 1;
-        campaigns[count] = Campaign({
+        campaingData = Campaign({
             creator: msg.sender,
             goal: _goal,
             pledged: 0,
@@ -65,63 +64,59 @@ contract PreSale {
             claimed: false
         });
 
-        emit Launch(count, msg.sender, _goal, _startAt, _endAt);
+        emit Launch(msg.sender, _goal, _startAt, _endAt);
     }
 
-    function cancel(uint256 _id) external {
-        Campaign memory campaign = campaigns[_id];
-        require(campaign.creator == msg.sender, "not creator");
-        require(block.timestamp < campaign.startAt, "started");
+    function cancel() external {
+        require(campaingData.creator == msg.sender, "not creator");
+        require(block.timestamp < campaingData.startAt, "started");
 
-        delete campaigns[_id];
-        emit Cancel(_id);
+        emit Cancel();
     }
 
-    function pledge(uint256 _id, uint256 _amount) external {
-        Campaign storage campaign = campaigns[_id];
-        require(block.timestamp >= campaign.startAt, "not started");
-        require(block.timestamp <= campaign.endAt, "ended");
+    function pledge(uint256 _amount) external {
+        require(block.timestamp >= campaingData.startAt, "not started");
+        require(block.timestamp <= campaingData.endAt, "ended");
 
-        campaign.pledged += _amount;
-        pledgedAmount[_id][msg.sender] += _amount;
+        campaingData.pledged += _amount;
+        pledgedAmount[msg.sender] += _amount;
         preSaleToken.transferFrom(msg.sender, address(this), _amount);
 
-        emit Pledge(_id, msg.sender, _amount);
+        emit Pledge(msg.sender, _amount);
     }
 
-    function unpledge(uint256 _id, uint256 _amount) external {
-        Campaign storage campaign = campaigns[_id];
-        require(block.timestamp <= campaign.endAt, "ended");
+    function unpledge(uint256 _amount) external {
+        require(block.timestamp <= campaingData.endAt, "ended");
 
-        campaign.pledged -= _amount;
-        pledgedAmount[_id][msg.sender] -= _amount;
+        campaingData.pledged -= _amount;
+        pledgedAmount[msg.sender] -= _amount;
         preSaleToken.transfer(msg.sender, _amount);
 
-        emit Unpledge(_id, msg.sender, _amount);
+        emit Unpledge(msg.sender, _amount);
     }
 
-    function claim(uint256 _id) external {
-        Campaign storage campaign = campaigns[_id];
-        require(campaign.creator == msg.sender, "not creator");
-        require(block.timestamp > campaign.endAt, "not ended");
-        require(campaign.pledged >= campaign.goal, "pledged < goal");
-        require(!campaign.claimed, "claimed");
+    function claim() external {
 
-        campaign.claimed = true;
-        preSaleToken.transfer(campaign.creator, campaign.pledged);
+        require(campaingData.creator == msg.sender, "not creator");
+        require(block.timestamp > campaingData.endAt, "not ended");
+        require(campaingData.pledged >= campaingData.goal, "pledged < goal");
+        require(!campaingData.claimed, "claimed");
 
-        emit Claim(_id);
+        campaingData.claimed = true;
+        preSaleToken.transfer(campaingData.creator, campaingData.pledged);
+
+        emit Claim();
     }
 
-    function refund(uint256 _id) external {
-        Campaign memory campaign = campaigns[_id];
-        require(block.timestamp > campaign.endAt, "not ended");
-        require(campaign.pledged < campaign.goal, "pledged >= goal");
+    function refund() external {
 
-        uint256 bal = pledgedAmount[_id][msg.sender];
-        pledgedAmount[_id][msg.sender] = 0;
+        require(block.timestamp > campaingData.endAt, "not ended");
+        require(campaingData.pledged < campaingData.goal, "pledged >= goal");
+
+        uint256 bal = pledgedAmount[msg.sender];
+        pledgedAmount[msg.sender] = 0;
         preSaleToken.transfer(msg.sender, bal);
 
-        emit Refund(_id, msg.sender, bal);
+        emit Refund(msg.sender, bal);
     }
 }
