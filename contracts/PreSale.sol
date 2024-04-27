@@ -130,8 +130,6 @@ contract PreSale {
     }
 
     function getAmountDeposit() external {
-
-        uint256 wasPledged = pledgedAmount[msg.sender];
-        emit GetAmountDeposit(wasPledged);
+        emit GetAmountDeposit(pledgedAmount[msg.sender]);
     }
 }
