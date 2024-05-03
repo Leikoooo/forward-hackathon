@@ -50,7 +50,7 @@ contract PreSaleContract is Ownable {
     function withdrawFunds() public onlyOwner {
         require(fundingComplete == false, "Funds already withdrawn");
         require(block.timestamp > endTimestamp, "Funding period is not over or goal not reached");
-        require(totalUsdtCollected >= goalUsdt,, "Funding period is not over or goal not reached");
+        require(totalUsdtCollected >= goalUsdt, "Funding period is not over or goal not reached");
         require(tokensDeposited, "preSale tokens must be deposited first");
 
         fundingComplete = true;
