@@ -59,13 +59,13 @@ contract PreSaleContract is Ownable {
 
     // Function to claim tokens for the contribution
     function claimTokens() public {
-    require(fundingComplete, "Funding not complete");
-    require(contributions[msg.sender] > 0, "No contribution made");
+        require(fundingComplete, "Funding not complete");
+        require(contributions[msg.sender] > 0, "No contribution made");
 
-    uint256 tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * preSaleToken.balanceOf(address(this));
+        uint256 tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * preSaleToken.balanceOf(address(this));
 
-    contributions[msg.sender] = 0; 
-    require(preSaleToken.transfer(msg.sender, tokensToClaim), "Failed to transfer tokens");
+        contributions[msg.sender] = 0; 
+        require(preSaleToken.transfer(msg.sender, tokensToClaim), "Failed to transfer tokens");
     }
 
     // Function to deposit preSale tokens to the contract
