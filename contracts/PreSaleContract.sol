@@ -11,10 +11,11 @@ contract PreSaleContract is Ownable {
     uint256 public startTimestamp; // Start time of the funding (UNIX timestamp)
     uint256 public endTimestamp; // End time of the funding (UNIX timestamp)
     uint256 public goalUsdt; // Goal in USDT
+    uint256 public totalUsdtCollected; 
 
-    bool public fundingComplete = false; // Flag indicating the funding is complete
-    bool public tokensDeposited = false; // Flag indicating the preSale tokens are deposited
-    uint256 public totalUsdtCollected = 0; 
+    bool public fundingComplete; // Flag indicating the funding is complete
+    bool public tokensDeposited; // Flag indicating the preSale tokens are deposited
+
     mapping(address => uint256) public contributions; // Mapping of user contributions
 
     constructor(
@@ -36,7 +37,8 @@ contract PreSaleContract is Ownable {
 
     // Function to contribute USDT to the funding
     function contribute(uint256 usdtAmount) public {
-        require(block.timestamp >= startTimestamp && block.timestamp <= endTimestamp, "Funding is not active");
+        require(block.timestamp >= startTimestamp, "Funding is not active");
+        require(block.timestamp <= endTimestamp, "Funding is not active");
         require(tokensDeposited, "preSale tokens must be deposited first");
         require(usdtToken.transferFrom(msg.sender, address(this), usdtAmount), "Failed to transfer USDT");
 
@@ -47,7 +49,8 @@ contract PreSaleContract is Ownable {
     // Function to withdraw funds to the owner
     function withdrawFunds() public onlyOwner {
         require(fundingComplete == false, "Funds already withdrawn");
-        require(block.timestamp > endTimestamp || totalUsdtCollected >= goalUsdt, "Funding period is not over or goal not reached");
+        require(block.timestamp > endTimestamp, "Funding period is not over or goal not reached");
+        require(totalUsdtCollected >= goalUsdt,, "Funding period is not over or goal not reached");
         require(tokensDeposited, "preSale tokens must be deposited first");
 
         fundingComplete = true;
@@ -59,9 +62,7 @@ contract PreSaleContract is Ownable {
     require(fundingComplete, "Funding not complete");
     require(contributions[msg.sender] > 0, "No contribution made");
 
-    uint256 totalPreSaleTokens = preSaleToken.balanceOf(address(this));
-
-    uint256 tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * totalPreSaleTokens;
+    uint256 tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * preSaleToken.balanceOf(address(this));
 
     contributions[msg.sender] = 0; 
     require(preSaleToken.transfer(msg.sender, tokensToClaim), "Failed to transfer tokens");
@@ -74,12 +75,12 @@ contract PreSaleContract is Ownable {
     }
 
     // Function to get the USDT balance of the contract
-    function getUsdtBalance() public view returns (uint256) {
+    function getUsdtBalance() external view returns (uint256) {
         return usdtToken.balanceOf(address(this));
     }
 
     // Function to get the presale token balance of the contract
-    function getpreSaleTokenBalance() public view returns (uint256) {
+    function getpreSaleTokenBalance() external view returns (uint256) {
         return preSaleToken.balanceOf(address(this));
     }
 }
