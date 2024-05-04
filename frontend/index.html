@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Two-Column Layout</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222222;
+        }
+
+        .wrapper {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            width: 60vw;
+            justify-content: center;
+        }
+
+        .column1 {
+            display: flex;
+            flex-direction: column;
+            width: 40vw;
+            margin-right: 20px;
+        }
+
+        .column2 {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row {
+            background-color: #282828;
+            margin-bottom: 10px;
+            padding: 20px 20px 24px 20px;
+            border-radius: 20px 20px 20px 20px;
+            box-shadow: 0px 4px 4px 0px #00000040;
+            color: #AEAEAE;
+        }
+
+        .descriptionRow {
+            display: flex;
+            flex-direction: column;
+            background-color: #282828;
+            margin-bottom: 10px;
+            padding: 20px 20px 20px 20px;
+            border-radius: 20px 20px 20px 20px;
+            box-shadow: 0px 4px 4px 0px #00000040;
+            color: #AEAEAE;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px 20px 20px 20px;
+            overflow: hidden;
+        }
+
+        .companyTitle {
+            display: flex;
+        }
+
+        .titleContainer {
+            padding-left: 10px;
+        }
+
+        .titleContainer p {
+            margin: 5px 0 5px 0;
+        }
+
+        .links a {
+            color: #ffffff;
+            margin-right: 10px;
+        }
+
+        .presaleAddress {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .presaleAddress p {
+            margin: 5px 0 5px 0;
+            word-wrap: break-word;
+        }
+
+        .tokenAddress {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tokenAddress p {
+            margin: 5px 0 5px 0;
+            word-wrap: break-word;
+        }
+
+        .address {
+            color: #5DA040;
+        }
+
+        .description {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #AEAEAE29
+        }
+
+        .descriptionEnd {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .value {
+            color: #ffffff;
+        }
+
+        .depositContainer p {
+            margin: 5px 0 5px 0;
+            color: #ffffff;
+        }
+
+        .depositContainer {
+            display: flex;
+            flex-direction: column;
+            background: #282828;
+            padding: 20px 20px 26px 20px;
+            border-radius: 15px;
+            border: 1px;
+            opacity: 0px;
+            box-shadow: 0px 4px 4px 0px #00000040;
+        }
+
+        .depositRow {
+            background-color: #2E2E2E;
+            margin-bottom: 10px;
+            padding: 20px 20px 20px 20px;
+            border-radius: 20px 20px 20px 20px;
+            box-shadow: 0px 4px 4px 0px #00000040;
+            color: #AEAEAE;
+            box-shadow: 0px 4px 4px 0px #00000040;
+            box-shadow: 0px -2px 13.2px 7px #8C8C8C0F inset;
+        }
+
+        .contribution {
+            font-size: 0.9rem;
+            color: #585858;
+            margin: 20px 0 0 20px;
+        }
+
+        .contribution em {
+            color: #517D3D;
+        }
+
+        .timeLeft {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .days,
+        .hours,
+        .minutes,
+        .seconds {
+            display: flex;
+            width: 4.5rem;
+            height: 3.5rem;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1D1D1D;
+            border-radius: 9px;
+            justify-content: center;
+        }
+
+        .days p,
+        .hours p,
+        .minutes p,
+        .seconds p {
+            margin: 0;
+            color: #C0C0C0;
+        }
+
+        .days p.value,
+        .hours p.value,
+        .minutes p.value,
+        .seconds p.value {
+            color: #ffffff;
+        }
+
+        .barContainer {
+            display: flex;
+            margin: 20px 0 20px 0;
+            flex-direction: column;
+        }
+
+        .bar {
+            width: 100%;
+            height: 7px;
+            background-color: #1D1D1D;
+            border-radius: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #5DA040;
+            border-radius: 10px;
+        }
+
+        .goal {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .depositContainer input {
+            padding: 14px 20px 14px 20px;
+            background-color: #1D1D1D;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .depositContainer button {
+            margin-top: 10px;
+            padding: 14px 20px 14px 20px;
+            background-color: #538C39;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0px 4px 11.6px 0px #6EBD4A inset;
+        }
+
+        .stages {
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 0 10px;
+        }
+
+        .stage {
+            display: flex;
+            padding: 10px 0 10px 0;
+            margin: 0 0 10px 0;
+            border-left: 3px solid #AEAEAE29;
+            flex-direction: column;
+            padding-left: 10px;
+            height: 2rem;
+            justify-content: center;
+        }
+
+        .stage p {
+            margin: 0;
+            color: #AEAEAE;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="column1">
+                <div class="row">
+                    <div class="companyTitle">
+                        <div class="avatar">
+                            <img src="https://www.w3schools.com/w3images/avatar2.png" alt="Avatar" style="width:100%">
+                        </div>
+                        <div class="titleContainer">
+                            <p>Shiba Inu Presale</h4>
+                            <div class="links">
+                                <a href="#">LinkedIn</a>
+                                <a href="#">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    <p>SHIB is a token that aims to bring technologies and major players from external networks into
+                        ETH. We have already prepared reputable funds for the launch of our project and are also
+                        attracting external investments for those willing to join the new and fast blockchain.
+                        <br><br>Our team consists of three individuals: Eugene, Lisa, and Marko. Each person leads their
+                        respective part of the work, ensuring that we are always focused on what matters.<br><br>Meme
+                        tokens are not just trading assets – they're a family. We believe that our project can create a
+                        new large family that will be eager to bring a multitude of enthusiasts and developers into the
+                        evolving blockchain space.
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="presaleAddress">
+                        <p>Presale Address: </p>
+                        <p class="address">0xtI6Vo3EW96UO</p>
+                    </div>
+                    <div class="tokenAddress">
+                        <p>Token Address:</p>
+                        <p class="address">0xtI6Vo3EW96UO</p>
+                    </div>
+
+                </div>
+                <div class="descriptionRow">
+                    <div class="description">
+                        <p>Total Supply: </p>
+                        <p class="value">2 200 000 000 SHIB</p>
+                    </div>
+                    <div class="description">
+                        <p>Tokens For Presale: </p>
+                        <p class="value">51 000 000 SHIB</p>
+                    </div>
+                    <div class="description">
+                        <p>Tokens For Liquidity: </p>
+                        <p class="value">23 409 000 SHIB</p>
+                    </div>
+                    <div class="description">
+                        <p>Limit per user: </p>
+                        <p class="value">200 ETH</p>
+                    </div>
+                    <div class="description">
+                        <p>Liquidity Percent: </p>
+                        <p class="value">51%</p>
+                    </div>
+                    <div class="descriptionEnd">
+                        <p>Current Rate: </p>
+                        <p class="value">1 SHIB = 0.000000184 ETH</p>
+                    </div>
+                </div>
+            </div>
+            <div class="column2">
+                <div class="depositRow">
+                    <div class="depositContainer">
+                        <p>Presale ends in:</p>
+                        <div class="timeLeft">
+                            <div class="days">
+                                <p class="value">723</p>
+                                <p>days</p>
+                            </div>
+                            <div class="hours">
+                                <p class="value">16</p>
+                                <p>hours</p>
+                            </div>
+                            <div class="minutes">
+                                <p class="value">38</p>
+                                <p>mins</p>
+                            </div>
+                            <div class="seconds">
+                                <p class="value">31</p>
+                                <p>secs</p>
+                            </div>
+                        </div>
+                        <div class="barContainer">
+                            <div class="bar">
+                                <div class="progress" style="width: 13%;">
+                                </div>
+                            </div>
+                            <div class="goal">
+                                <p>142.13 ETH</p>
+                                <p>1 000 ETH</p>
+                            </div>
+                        </div>
+                        <input type="text" placeholder="0">
+                        <button>Deposit</button>
+                    </div>
+                    <p class="contribution">Your Contribution <em>0</em> ETH</p>
+                </div>
+                <div class="row">
+                    <div class="stages">
+                        <div class="stage" style="border-color: #538C39;">
+                            <p style="color: #ffffff;">Pool Start</p>
+                            <p style="color: #ffffff;">2024.05.02 13:00 (UTC)</p>
+                        </div>
+                        <div class="stage" style="border-color: #538C39;">
+                            <p style="color: #ffffff;">Pool End</p>
+                            <p style="color: #ffffff;">2024.05.02 13:00 (UTC)</p>
+                        </div>
+                        <div class="stage">
+                            <p>Claim Tokens</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="currentRate">
+                        <p>Current Rate:</p>
+                        <p class="value">1 SHIB = 0.000000184 ETH</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
