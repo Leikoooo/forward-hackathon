@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0z;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// Forward testnet <3
+
 contract PreSaleContract is Ownable {
-    IERC20 public usdtToken; // USDT token contract
-    IERC20 public preSaleToken; // preSale token contract
+    IERC20 private usdtToken; // USDT token contract
+    IERC20 private preSaleToken; // preSale token contract
 
-    uint256 public startTimeStamp; // Start time of the funding (UNIX timestamp)
-    uint256 public endTimeStamp; // End time of the funding (UNIX timestamp)
-    uint256 public goalUsdt; // Goal in USDT
-    uint256 public totalUsdtCollected; 
-    uint256 public tokensToClaim;
+    uint256 private startTimeStamp; // Start time of the funding (UNIX timestamp)
+    uint256 private endTimeStamp; // End time of the funding (UNIX timestamp)
+    uint256 private goalUsdt; // Goal in USDT
+    uint256 private totalUsdtCollected; 
+    uint256 private tokensPerUsdt;
 
-    bool public fundingComplete; // Flag indicating the funding is complete
-    bool public tokensDeposited; // Flag indicating the preSale tokens are deposited
+    bool private fundingComplete; // Flag indicating the funding is complete
+    bool private tokensDeposited; // Flag indicating the preSale tokens are deposited
 
-    mapping(address => uint256) public contributions; // Mapping of user contributions
+    mapping(address => uint256) private contributions; // Mapping of user contributions
 
     constructor(
         address _usdtToken,
@@ -34,8 +36,6 @@ contract PreSaleContract is Ownable {
         goalUsdt = _goalUsdt;
         startTimeStamp = _startTimeStamp;
         endTimeStamp = _endTimeStamp;
-
-        tokensToClaim = preSaleToken.balanceOf(address(this)) / goalUsdt;
     }
 
     // Function to contribute USDT to the funding
@@ -65,7 +65,7 @@ contract PreSaleContract is Ownable {
         require(fundingComplete, "Funding not complete");
         require(contributions[msg.sender] > 0, "No contribution made");
 
-        tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * preSaleToken.balanceOf(address(this));
+        uint256 tokensToClaim = (contributions[msg.sender] / totalUsdtCollected) * preSaleToken.balanceOf(address(this));
 
         contributions[msg.sender] = 0; 
         require(preSaleToken.transfer(msg.sender, tokensToClaim), "Failed to transfer tokens");
@@ -75,12 +75,14 @@ contract PreSaleContract is Ownable {
     function depositPreSaleTokens(uint256 tokenAmount) public onlyOwner {
         require(!fundingComplete, "Token was already deposited");
         require(preSaleToken.transferFrom(msg.sender, address(this), tokenAmount), "Token transfer failed");
-        tokensDeposited = true;
-    }
 
-    // Function to get the USDT balance of the contract
-    function getUsdtBalance() external view returns (uint256) {
-        return usdtToken.balanceOf(address(this));
+        tokensDeposited = true;
+
+        // Convert goalUsdt to 18 decimals
+        uint256 goalUsdt18Decimals = goalUsdt * 1e12;
+
+        // Calculate tokens per USDT
+        tokensPerUsdt = preSaleToken.balanceOf(address(this)) / goalUsdt18Decimals;
     }
 
     // Function to get the presale token balance of the contract
@@ -88,18 +90,54 @@ contract PreSaleContract is Ownable {
         return preSaleToken.balanceOf(address(this));
     }
 
-    // Function to get start time of the funding (UNIX timestemp)
-    function getStartTimeStamp() external view returns (uint256) {
-        return startTimeStamp;
+    // Returns the USDT token contract address
+    function getUsdtToken() public view returns (IERC20) {
+        return usdtToken;
     }
     
-    // Function to get end time of the funding (UNIX timestemp)
-    function getEndTimeStamp() external view returns (uint256) {
+    // Returns the pre-sale token contract address.
+    function getPreSaleToken() public view returns (IERC20) {
+        return preSaleToken;
+    }
+
+    // Returns the start timestamp of the funding.
+    function getStartTimeStamp() public view returns (uint256) {
+        return startTimeStamp;
+    }
+
+    // Returns the end timestamp of the funding.
+    function getEndTimeStamp() public view returns (uint256) {
         return endTimeStamp;
     }
 
-    // 
-    function getTokensToClaim() external view returns (uint256) {
-        return tokensToClaim;
+    // Returns the goal amount of USDT to be raised.
+    function getGoalUsdt() public view returns (uint256) {
+        return goalUsdt;
     }
+
+    // Returns the total USDT collected so far.
+    function getTotalUsdtCollected() public view returns (uint256) {
+        return totalUsdtCollected;
+    }
+    
+    // Returns the number of tokens per USDT.
+    function getTokensPerUsdt() public view returns(uint256) {
+        return tokensPerUsdt;
+    }
+
+    // Returns whether the funding is complete.
+    function isFundingComplete() public view returns (bool) {
+        return fundingComplete;
+    }
+
+    // Returns whether the pre-sale tokens have been deposited.
+    function areTokensDeposited() public view returns (bool) {
+        return tokensDeposited;
+    }
+
+    // Returns the contribution made by a specific address.
+    function getContribution(address contributor) public view returns (uint256) {
+        return contributions[contributor];
+    }
+
 }
