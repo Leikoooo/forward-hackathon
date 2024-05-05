@@ -1,0 +1,205 @@
+<body>
+    <script>
+      function refresh(value) {
+        document.querySelector(`#form-${value}
+  button`).click()
+      }
+      async function main() {
+        refresh('getUsdtToken')
+        refresh('getPreSaleToken')
+        refresh('getTokensPerUsdt')
+        refresh('getStartTimeStamp')
+        refresh('getEndTimeStamp')
+        document.getElementById('join-btn').onclick = () => {
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getUsdtToken-0').innerText
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getPreSaleToken-0').innerText
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getTokensPerUsdt-0').innerText
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getTokensPerUsdt-1').innerText
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getStartTimeStamp-0').innerText
+          document.getElementById('form-input-enter-payable').value = document.getElementById('form-output-getEndTimeStamp-0').innerText
+        }
+      }
+      setTimeout(main, 200)
+    </script>
+    <title>Two-Column Layout
+    </title>
+    <div class="wrapper">
+      <div class="container">
+        <div class="column1">
+          <div class="row">
+            <div class="companyTitle">
+              <div class="avatar">
+                <img src="https://www.w3schools.com/w3images/avatar2.png" alt="Avatar" id="i4wh"/>
+              </div>
+              <div class="titleContainer">
+                <p>Shiba Inu Presale
+                </p>
+                <div class="links">
+                  <a href="#">LinkedIn</a>
+                  <a href="#">GitHub</a>
+                </div>
+              </div>
+            </div>
+            <p>SHIB is a token that aims to bring technologies and major players from external networks into
+              ETH. We have already prepared reputable funds for the launch of our project and are also
+              attracting external investments for those willing to join the new and fast blockchain.
+              <br/>
+              <br/>Our team consists of three individuals: Eugene, Lisa, and Marko. Each person leads their
+              respective part of the work, ensuring that we are always focused on what matters.
+              <br/>
+              <br/>Meme
+              tokens are not just trading assets – they're a family. We believe that our project can create a
+              new large family that will be eager to bring a multitude of enthusiasts and developers into the
+              evolving blockchain space.
+            </p>
+          </div>
+          <div class="row">
+            <div class="presaleAddress">
+              <p>Presale Address: 
+              </p>
+              <span id="form-output-getPreSaleToken-0" data-form-name="getPreSaleToken" data-field-type="address" class="address">presale address</span>
+            </div>
+            <div class="tokenAddress">
+              <p>Token Address:
+              </p>
+              <span id="form-output-getUsdtToken-0" data-form-name="getUsdtToken" data-field-type="address" class="address"> USDT address</span>
+            </div>
+          </div>
+          <div class="descriptionRow">
+            <div class="description">
+              <p>Total Supply: 
+              </p>
+              <p class="value">2 200 000 000 SHIB
+              </p>
+            </div>
+            <div class="description">
+              <p>Tokens For Presale: 
+              </p>
+              <p class="value">51 000 000 SHIB
+              </p>
+            </div>
+            <div class="description">
+              <p>Tokens For Liquidity: 
+              </p>
+              <p class="value">23 409 000 SHIB
+              </p>
+            </div>
+            <div class="description">
+              <p>Limit per user: 
+              </p>
+              <p class="value">200 ETH
+              </p>
+            </div>
+            <div class="description">
+              <p>Liquidity Percent: 
+              </p>
+              <p class="value">51%
+              </p>
+            </div>
+            <div class="descriptionEnd">
+              <p>Current Rate: 
+              </p>
+              <p class="value">1 SHIB = 
+                <em><span id="form-output-getTokensPerUsdt-0" data-form-name="getTokensPerUsdt" data-field-type="uint256">tokensPerUsdt</span></em> ETH
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="column2">
+          <div class="depositRow">
+            <div class="depositContainer">
+              <p>Presale ends in:
+              </p>
+              <div class="timeLeft">
+                <div class="days">
+                  <p class="value">723
+                  </p>
+                  <p>days
+                  </p>
+                </div>
+                <div class="hours">
+                  <p class="value">16
+                  </p>
+                  <p>hours
+                  </p>
+                </div>
+                <div class="minutes">
+                  <p class="value">38
+                  </p>
+                  <p>mins
+                  </p>
+                </div>
+                <div class="seconds">
+                  <p class="value">31
+                  </p>
+                  <p>secs
+                  </p>
+                </div>
+              </div>
+              <div class="barContainer">
+                <div class="bar">
+                  <div id="iaoa2" class="progress">
+                  </div>
+                </div>
+                <div class="goal">
+                  <p id="ituoy">142.13 ETH
+                  </p>
+                  <p id="iod563">1 000 ETH
+                  </p>
+                </div>
+              </div>
+              <input type="text" placeholder="0" id="form-input-contribute-usdtAmount" data-form-name="contribute" data-field-type="uint256" class="form-control"/>
+              <button type="button" data-form-name="contribute" class="deposit">
+                Deposit
+              </button>
+            </div>
+            <p class="contribution">Your Contribution 
+              <em>0</em> USDT
+            </p>
+          </div>
+          <div class="row">
+            <div class="stages">
+              <div id="izg068" class="stage">
+                <p id="i5pcj7">Pool Start
+                </p>
+                <span id="form-output-getStartTimeStamp-0" data-form-name="getStartTimeStamp" data-field-type="uint256">poolStartUnixTime</span>
+              </div>
+              <div id="irx6zf" class="stage">
+                <p id="i1aamx">Pool End        
+                </p>
+                <span id="form-output-getEndTimeStamp-0" data-form-name="getEndTimeStamp" data-field-type="uint256">poolEndUnixTime</span>
+              </div>
+              <div class="stage">
+                <p id="ijroi5">Claim Tokens
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="currentRate">
+              <p>Current Rate:
+              </p>
+              <p class="value">1 PreSaleToken = 
+                <em><span id="form-output-getTokensPerUsdt-1" data-form-name="getTokensPerUsdt" data-field-type="uint256">tokensPerUsdt</span></em> $USDT
+              </p>
+            </div>
+          </div>
+          <form id="form-getUsdtToken" class="autoreq">
+            <button type="button" data-form-name="getUsdtToken" class="btn btn-primary mt-2">getusdttokenADDRESS</button>
+          </form>
+          <form id="form-getPreSaleToken" class="autoreq">
+            <button type="button" data-form-name="getPreSaleToken" class="btn btn-primary mt-2"><span id="id8cfh">getpresaletokenADDRESS</span></button>
+          </form>
+          <form id="form-getTokensPerUsdt" class="autoreq">
+            <button type="button" data-form-name="getTokensPerUsdt" class="btn btn-primary mt-2"><span id="ilhzrl">getTokensPerUsdt</span><br/></button>
+          </form>
+          <form id="form-getStartTimeStamp" class="autoreq">
+            <button type="button" data-form-name="getStartTimeStamp" class="btn btn-primary mt-2">getStartTimeStamp</button>
+          </form>
+          <form id="form-getEndTimeStamp" class="autoreq">
+            <button type="button" data-form-name="getEndTimeStamp" class="btn btn-primary mt-2">getEndTimeStamp</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
