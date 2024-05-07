@@ -1,0 +1,189 @@
+<body>
+    <div class="wrapper">
+      <div class="panel">
+        <div class="top-block">
+          <h2>$SHIB Admin panel
+          </h2>
+          <input id="form-input-depositPreSaleTokens-tokenAmount" type="text" placeholder="0" data-form-name="depositPreSaleTokens" data-field-type="uint256" class="form-control"/>
+          <button id="approveButton" type="button" onclick="approve()" class="buttons">Approve</button>
+          <button type="button" data-form-name="depositPreSaleTokens" class="buttons">
+            Deposit tokens
+          </button>
+          <button type="button" data-form-name="withdrawFunds" class="buttons">
+            Widthdraw USDT
+          </button>
+        </div>
+        <div class="depositRow">
+          <div class="depositContainer">
+            <p>Presale ends in:
+            </p>
+            <div class="timeLeft">
+              <div class="days">
+                <p class="secs">723
+                </p>
+                <p>days
+                </p>
+              </div>
+              <div class="hours">
+                <p class="secs">16
+                </p>
+                <p id="in3ma">hours
+                </p>
+              </div>
+              <div class="minutes">
+                <p class="mins">38
+                </p>
+                <p>mins
+                </p>
+              </div>
+              <div class="seconds">
+                <p class="secs">31
+                </p>
+                <p>secs
+                </p>
+              </div>
+            </div>
+            <div class="barContainer">
+              <div class="bar">
+                <div id="iaoa2" class="progress">
+                </div>
+              </div>
+              <div class="goal">
+                <span id="form-output-getTotalUsdtCollected-0" data-form-name="getTotalUsdtCollected" data-field-type="uint256">Collected</span>
+                <span id="form-output-getGoalUsdt-0" data-form-name="getGoalUsdt" data-field-type="uint256">Goal</span>
+              </div>
+            </div>
+          </div>
+          <p class="contributors">Total contributors
+            <em>0</em>
+          </p>
+        </div>
+      </div>
+      <div class="p-2">
+        <div class="accordion">
+          <div class="accordion-item">
+            <section class="m-auto w-100">
+              <h3 id="headingOne" class="accordion-header text-center">
+              </h3>
+              <div id="collapse_getPreSaleToken" data-bs-parent="#accordionExample" aria-labelledby="headingOne" class="accordion-collapse collapse">
+              </div>
+            </section>
+          </div>
+        </div>
+        <span id="form-output-getPreSaleToken-0" data-form-name="getPreSaleToken" data-field-type="address">address</span>
+      </div>
+    </div>
+    <form id="form-getStartTimeStamp" class="autoreq">
+      <button type="button" data-form-name="getStartTimeStamp" class="btn btn-primary mt-2">
+        getStartTimeStamp
+      </button>
+    </form>
+    <form id="form-getPreSaleToken" class="autoreq">
+      <button type="button" data-form-name="getPreSaleToken" class="btn btn-primary mt-2">
+        getPreSaleToken
+      </button>
+    </form>
+    <form id="form-getEndTimeStamp" class="autoreq">
+      <button type="button" data-form-name="getEndTimeStamp" class="btn btn-primary mt-2">
+        getEndTimeStamp
+      </button>
+    </form>
+    <form id="form-getGoalUsdt" class="autoreq">
+      <button type="button" data-form-name="getGoalUsdt" class="btn btn-primary mt-2">
+        getGoalUsdt
+      </button>
+    </form>
+    <form id="form-getTotalUsdtCollected" class="autoreq">
+      <button type="button" data-form-name="getTotalUsdtCollected" class="btn btn-primary mt-2">
+        getTotalUsdtCollected
+      </button>
+    </form>
+    <script>
+      async function approve() {
+        const contractAddress = document.querySelector("#form-output-getPreSaleToken-0").value;
+        const spenderAddress = document.getElementById("spenderAddress").value;
+        const tokenAmount = document.querySelector("#form-input-depositPreSaleTokens-tokenAmount").value;
+        console.log("approve Tokens button is clicked");
+        console.log("Token Amount: " + tokenAmount);
+        try {
+          document.getElementById("approveButton").innerHTML = `<div class="spinner-grow spinner-grow-sm" role="status"></div>`;
+          const abi = [{
+            "inputs": [{
+              "internalType": "address", "name": "spender", "type": "address"
+            }
+                       ,
+                       {
+                         "internalType": "uint256", "name": "amount", "type": "uint256"
+                       }
+                      ],
+            "name": "approve",
+            "outputs": [{
+              "internalType": "bool", "name": "", "type": "bool"
+            }
+                       ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+                      ];
+          const provider = new ethers.providers.Web3Provider(this.parent.ethereum);
+          const signer = provider.getSigner();
+          const contract = new ethers.Contract(contractAddress, abi, signer);
+          const amount = ethers.utils.parseUnits(tokenAmount, 18);
+          console.log("Parsed token amount: " + amount);
+          const approveTx = await contract.approve(spenderAddress, amount);
+          await approveTx.wait();
+          console.log("Successfully approved");
+        }
+        catch (e) {
+          console.error("Error: ", e);
+          document.getElementById("approveButton").innerHTML = 'Approve';
+          alert("Transaction failed: " + e.message);
+        }
+      }
+      async function main() {
+        refresh("getStartTimeStamp");
+        refresh("getEndTimeStamp");
+        refresh("getGoalUsdt");
+        refresh("getTotalUsdtCollected");
+        refresh("getPreSaleToken");
+      }
+      setTimeout(main, 200);
+      async function setParams() {
+        const goal = parseInt(
+          document.querySelector("#form-output-getGoalUsdt-0").innerText
+        );
+        const contribution = parseInt(
+          document.querySelector("#form-output-getTotalUsdtCollected-0").innerText
+        );
+        const percent = (contribution / goal) * 100;
+        document.querySelector(".progress").style.width = `${percent}
+  %`;
+        const now = new Date().getTime();
+        const start =
+              parseInt(
+                document.querySelector("#form-output-getStartTimeStamp-0").innerText
+              );
+        const end =
+              parseInt(
+                document.querySelector("#form-output-getEndTimeStamp-0").innerText
+              ) * 1000;
+        const timeLeft = end - now;
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        document.querySelector(".days").innerHTML = `<p class="days">${days}
+      </p><p>days</p>`;
+        document.querySelector(".hours").innerHTML = `<p class="hours">${hours}
+      </p><p>hours</p>`;
+        document.querySelector(".minutes").innerHTML = `<p class="mins">${minutes}
+      </p><p>mins</p>`;
+        document.querySelector(".seconds").innerHTML = `<p class="secs">${seconds}
+      </p><p>secs</p>`;
+      }
+      setInterval(setParams, 1200);
+    </script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  </body>

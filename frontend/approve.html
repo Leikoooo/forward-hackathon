@@ -1,0 +1,339 @@
+<body id="ifxf">
+    <meta charset="UTF-8" />
+    <title>NFT Purchase Form
+    </title>
+    <form id="contractForm">
+        <label for="contractAddress">Contract Address:</label>
+        <input id="contractAddress" type="text" placeholder="Enter Contract Address" />
+    </form>
+    <form id="approveForm">
+        <label for="spenderAddress">Spender Address:</label>
+        <input id="spenderAddress" type="text" placeholder="Enter Spender Address" />
+        <label for="tokenAmount">Token Amount:</label>
+        <input id="tokenAmount" type="number" placeholder="Enter Amount" />
+        <button id="approveButton" type="button" onclick="buyNFT()">Approve</button>
+    </form>
+    <script>
+        async function buyNFT() {
+            const contractAddress = document.getElementById("contractAddress").value;
+            const spenderAddress = document.getElementById("spenderAddress").value;
+            const tokenAmount = document.getElementById("tokenAmount").value;
+            console.log("approve ERC20 button is clicked");
+            console.log("Token Amount: " + tokenAmount);
+            try {
+                document.getElementById("approveButton").innerHTML = `<div class="spinner-grow spinner-grow-sm" role="status"></div>`;
+                const abi = [{
+                    "inputs": [{
+                        "internalType": "address", "name": "spender", "type": "address"
+                    }
+                        ,
+                    {
+                        "internalType": "uint256", "name": "amount", "type": "uint256"
+                    }
+                    ],
+                    "name": "approve",
+                    "outputs": [{
+                        "internalType": "bool", "name": "", "type": "bool"
+                    }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+                ];
+                const provider = new ethers.providers.Web3Provider(this.parent.ethereum);
+                const signer = provider.getSigner();
+                const contract = new ethers.Contract(contractAddress, abi, signer);
+                const amount = ethers.utils.parseUnits(tokenAmount, 18);
+                console.log("Parsed token amount: " + amount);
+                // Call the approve function
+                const approveTx = await contract.approve(spenderAddress, amount);
+                await approveTx.wait();
+                console.log("Successfully approved");
+            }
+            catch (e) {
+                console.error("Error: ", e);
+                document.getElementById("approveButton").innerHTML = 'Approve';
+                alert("Transaction failed: " + e.message);
+            }
+        }
+    </script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_depositPreSaleTokens" aria-expanded="true"
+                            data-bs-target="#collapse_depositPreSaleTokens" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            depositPreSaleTokens
+                        </button>
+                    </h3>
+                    <div id="collapse_depositPreSaleTokens" data-bs-parent="#accordionExample"
+                        aria-labelledby="headingOne" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-depositPreSaleTokens" class="d-flex flex-column gap-2 p-2">
+                                <div class="form-group">
+                                    <label class="form-label">tokenAmount</label>
+                                    <input id="form-input-depositPreSaleTokens-tokenAmount" type="text"
+                                        placeholder="Enter value as tokenAmount<uint256>"
+                                        data-form-name="depositPreSaleTokens" data-field-type="uint256"
+                                        class="form-control" />
+                                </div>
+                                <div>
+                                    <button type="button" data-form-name="depositPreSaleTokens"
+                                        class="btn btn-primary mt-2">
+                                        Write
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-2" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_withdrawFunds" aria-expanded="true"
+                            data-bs-target="#collapse_withdrawFunds" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            withdrawFunds
+                        </button>
+                    </h3>
+
+                    <div id="collapse_withdrawFunds" data-bs-parent="#accordionExample" aria-labelledby="headingOne"
+                        class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-withdrawFunds" class="d-flex flex-column gap-2 p-2">
+                                <div>
+                                    <button type="button" data-form-name="withdrawFunds" class="btn btn-primary mt-2">
+                                        Write
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-3" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_contribute" aria-expanded="true"
+                            data-bs-target="#collapse_contribute" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            contribute
+                        </button>
+                    </h3>
+                    <div id="collapse_contribute" data-bs-parent="#accordionExample" aria-labelledby="headingOne"
+                        class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-contribute" class="d-flex flex-column gap-2 p-2">
+                                <div class="form-group">
+                                    <label class="form-label">usdtAmount</label>
+                                    <input id="form-input-contribute-usdtAmount" type="text"
+                                        placeholder="Enter value as usdtAmount<uint256>" data-form-name="contribute"
+                                        data-field-type="uint256" class="form-control" />
+                                </div>
+                                <div>
+                                    <button type="button" data-form-name="contribute" class="btn btn-primary mt-2">
+                                        Write
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-4" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_claimTokens" aria-expanded="true"
+                            data-bs-target="#collapse_claimTokens" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            claimTokens
+                        </button>
+                    </h3>
+                    <div id="collapse_claimTokens" data-bs-parent="#accordionExample" aria-labelledby="headingOne"
+                        class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-claimTokens" class="d-flex flex-column gap-2 p-2">
+                                <div>
+                                    <button type="button" data-form-name="claimTokens" class="btn btn-primary mt-2">
+                                        Write
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-5" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_getPreSaleToken" aria-expanded="true"
+                            data-bs-target="#collapse_getPreSaleToken" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            getPreSaleToken
+                        </button>
+                    </h3>
+                    <div id="collapse_getPreSaleToken" data-bs-parent="#accordionExample" aria-labelledby="headingOne"
+                        class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-getPreSaleToken" class="d-flex flex-column gap-2 p-2">
+                                <div>
+                                    <button type="button" data-form-name="getPreSaleToken" class="btn btn-primary mt-2">
+                                        Read
+                                    </button>
+                                </div>
+                                <div>
+                                    <p>Response:
+                                    </p>
+                                    <div>:
+                                        <span id="form-output-getPreSaleToken-0" data-form-name="getPreSaleToken"
+                                            data-field-type="address">address</span>
+                                        <br />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-6" class="accordion-header text-center">
+
+                        <button type="button" aria-controls="collapse_getUsdtToken" aria-expanded="true"
+                            data-bs-target="#collapse_getUsdtToken" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            getUsdtToken
+                        </button>
+                    </h3>
+                    <div id="collapse_getUsdtToken" data-bs-parent="#accordionExample" aria-labelledby="headingOne"
+                        class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-getUsdtToken" class="d-flex flex-column gap-2 p-2">
+                                <div>
+                                    <button type="button" data-form-name="getUsdtToken" class="btn btn-primary mt-2">
+                                        Read
+                                    </button>
+                                </div>
+                                <div>
+                                    <p>Response:
+                                    </p>
+                                    <div>:
+                                        <span id="form-output-getUsdtToken-0" data-form-name="getUsdtToken"
+                                            data-field-type="address">address</span>
+                                        <br />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="accordion">
+            <div class="accordion-item">
+                <section class="m-auto w-100">
+                    <h3 id="headingOne-7" class="accordion-header text-center">
+                        <button type="button" aria-controls="collapse_getPreSaleContractAddress" aria-expanded="true"
+                            data-bs-target="#collapse_getPreSaleContractAddress" data-bs-toggle="collapse"
+                            class="accordion-button collapsed">
+                            getPreSaleContractAddress
+                        </button>
+                    </h3>
+                    <div id="collapse_getPreSaleContractAddress" data-bs-parent="#accordionExample"
+                        aria-labelledby="headingOne" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <form id="form-getPreSaleContractAddress" class="d-flex flex-column gap-2 p-2">
+                                <div>
+                                    <button type="button" data-form-name="getPreSaleContractAddress"
+                                        class="btn btn-primary mt-2">
+                                        Read
+                                    </button>
+                                </div>
+                                <div>
+                                    <p>Response:
+                                    </p>
+                                    <div>:
+                                        <span id="form-output-getPreSaleContractAddress-0"
+                                            data-form-name="getPreSaleContractAddress"
+                                            data-field-type="address">address</span>
+                                        <br />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    async function buyNFT() {
+        const contractAddress = document.getElementById("contractAddress").value;
+        const spenderAddress = document.getElementById("spenderAddress").value;
+        const tokenAmount = document.getElementById("tokenAmount").value;
+        console.log("approve ERC20 button is clicked");
+        console.log("Token Amount: " + tokenAmount);
+        try {
+            document.getElementById("approveButton").innerHTML = `<div class="spinner-grow spinner-grow-sm" role="status"></div>`;
+            const abi = [{
+                "inputs": [{
+                    "internalType": "address", "name": "spender", "type": "address"
+                }
+                    ,
+                {
+                    "internalType": "uint256", "name": "amount", "type": "uint256"
+                }
+                ],
+                "name": "approve",
+                "outputs": [{
+                    "internalType": "bool", "name": "", "type": "bool"
+                }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+            ];
+            const provider = new ethers.providers.Web3Provider(this.parent.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(contractAddress, abi, signer);
+            const amount = ethers.utils.parseUnits(tokenAmount, 18);
+            console.log("Parsed token amount: " + amount);
+            // Call the approve function
+            const approveTx = await contract.approve(spenderAddress, amount);
+            await approveTx.wait();
+            console.log("Successfully approved");
+        }
+        catch (e) {
+            console.error("Error: ", e);
+            document.getElementById("approveButton").innerHTML = 'Approve';
+            alert("Transaction failed: " + e.message);
+        }
+    }
+</script>
