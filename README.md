@@ -4,3 +4,6 @@ https://docs.google.com/document/d/1V_zt5D1KElLPa2BjepImBhC3KFU3XqQcQdMnp5Ab464/
 
 Instruction
 https://docs.google.com/document/d/1-lakvripfRTR4BDwOEmVe90ZrbhBP-zvN_9abqwrY-s/edit
+
+Video deploy
+https://www.youtube.com/watch?v=CRrHMxtY9zw&feature=youtu.be
