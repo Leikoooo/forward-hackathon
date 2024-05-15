@@ -6,4 +6,4 @@ Instruction
 https://docs.google.com/document/d/1-lakvripfRTR4BDwOEmVe90ZrbhBP-zvN_9abqwrY-s/edit
 
 Video deploy
-https://www.youtube.com/watch?v=CRrHMxtY9zw&feature=youtu.be
+https://youtu.be/Kkj9-K_yJiY
