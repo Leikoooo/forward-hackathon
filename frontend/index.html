@@ -1,377 +1,382 @@
-<body>
-  <script>
-	function refresh(value) {
-	  document
-		.querySelector(
-		`#form-${value}
-button`
-	  )
-		.click();
-	}
-	async function approve() {
-	  const contractAddress = document.querySelector("#form-output-getUsdtToken-0").value;
-	  const spenderAddress = document.getElementById("spenderAddress").value;
-	  const tokenAmount = document.querySelector("#form-input-contribute-usdtAmount").value;
-	  console.log("approve ERC20 button is clicked");
-	  console.log("Token Amount: " + tokenAmount);
-	  try {
-		document.getElementById("approveButton").innerHTML = `<div class="spinner-grow spinner-grow-sm" role="status"></div>`;
-		const abi = [{
-		  "inputs": [{
-			"internalType": "address", "name": "spender", "type": "address"
+<body id="ickq">
+	<link href="index.css" rel="stylesheet" type="text/css"/>
+	<script>
+	  function refresh(value) {
+		document
+		  .querySelector(
+		  `#form-${value}
+  button`
+		)
+		  .click();
+	  }
+	  async function approve() {
+		const contractAddress = document.querySelector("#form-output-getUsdtToken-0").innerText;
+		const spenderAddress = document.querySelector("#form-output-getPreSaleContractAddress-0").innerText;
+		const tokenAmount = document.querySelector("#form-input-contribute-usdtAmount").value;
+		console.log("approve ERC20 button is clicked");
+		console.log("Token Amount: " + tokenAmount);
+		try {
+		  document.getElementById("approveButton").innerHTML = `<div class="spinner-grow spinner-grow-sm" role="status"></div>`;
+		  const abi = [{
+			"inputs": [{
+			  "internalType": "address", "name": "spender", "type": "address"
+			}
+					   ,
+					   {
+						 "internalType": "uint256", "name": "amount", "type": "uint256"
+					   }
+					  ],
+			"name": "approve",
+			"outputs": [{
+			  "internalType": "bool", "name": "", "type": "bool"
+			}
+					   ],
+			"stateMutability": "nonpayable",
+			"type": "function"
 		  }
-					 ,
-					 {
-					   "internalType": "uint256", "name": "amount", "type": "uint256"
-					 }
-					],
-		  "name": "approve",
-		  "outputs": [{
-			"internalType": "bool", "name": "", "type": "bool"
-		  }
-					 ],
-		  "stateMutability": "nonpayable",
-		  "type": "function"
+					  ];
+		  const provider = new ethers.providers.Web3Provider(this.parent.ethereum);
+		  const signer = provider.getSigner();
+		  const contract = new ethers.Contract(contractAddress, abi, signer);
+		  const amount = tokenAmount
+		  console.log("Parsed token amount: " + amount);
+		  const approveTx = await contract.approve(spenderAddress, amount);
+		  await approveTx.wait();
+		  alert("Successfully approved");
 		}
-					];
-		const provider = new ethers.providers.Web3Provider(this.parent.ethereum);
-		const signer = provider.getSigner();
-		const contract = new ethers.Contract(contractAddress, abi, signer);
-		const amount = ethers.utils.parseUnits(tokenAmount, 18);
-		console.log("Parsed token amount: " + amount);
-		const approveTx = await contract.approve(spenderAddress, amount);
-		await approveTx.wait();
-		console.log("Successfully approved");
+		catch (e) {
+		  console.error("Error: ", e);
+		  document.getElementById("approveButton").innerHTML = 'Approve';
+		  alert("Transaction failed: " + e.message);
+		}
 	  }
-	  catch (e) {
-		console.error("Error: ", e);
-		document.getElementById("approveButton").innerHTML = 'Approve';
-		alert("Transaction failed: " + e.message);
+	  async function main() {
+		refresh("getUsdtToken");
+		refresh("getPreSaleToken");
+		refresh("getPreSaleContractAddress");
+		refresh("getTotalUsdtCollected");
+		refresh("getTokensPerUsdt");
+		refresh("getStartTimeStamp");
+		refresh("getEndTimeStamp");
+		refresh("getGoalUsdt");
+		refresh("getPreSaleBalance");
+		refresh("areTokensDeposited");
+		refresh("isFundingComplete");
 	  }
-	}
-	async function main() {
-	  refresh("getUsdtToken");
-	  refresh("getPreSaleToken");
-	  refresh("getTokensPerUsdt");
-	  refresh("getStartTimeStamp");
-	  refresh("getEndTimeStamp");
-	  refresh("getGoalUsdt");
-	  refresh("getPreSaleBalance");
-	  refresh("getTotalUsdtCollected");
-	}
-	async function parseData() {
-	}
-	setTimeout(main, 200);
-	async function setParams() {
-	  const goal = parseInt(
-		document.querySelector("#form-output-getGoalUsdt-0").innerText
-	  );
-	  const contribution = parseInt(
-		document.querySelector("#form-output-getTotalUsdtCollected-0").innerText
-	  );
-	  const percent = (contribution / goal) * 100;
-	  document.querySelector(".progress").style.width = `${percent}
-%`;
-	  document.querySelector(".tokensPerUsdtRate").innerText =
-		document.querySelector("#form-output-getTokensPerUsdt-0").innerText;
-	  const now = new Date().getTime();
-	  const start =
-			parseInt(
-			  document.querySelector("#form-output-getStartTimeStamp-0").innerText
-			);
-	  const end =
-			parseInt(
-			  document.querySelector("#form-output-getEndTimeStamp-0").innerText
-			) * 1000;
-	  const timeLeft = end - now;
-	  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-	  const hours = Math.floor(
-		(timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-	  );
-	  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-	  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-	  document.querySelector(".days").innerHTML = `<p class="days">${days}
-	</p><p>days</p>`;
-	  document.querySelector(".hours").innerHTML = `<p class="hours">${hours}
-	</p><p>hours</p>`;
-	  document.querySelector(".minutes").innerHTML = `<p class="mins">${minutes}
-	</p><p>mins</p>`;
-	  document.querySelector(".seconds").innerHTML = `<p class="secs">${seconds}
-	</p><p>secs</p>`;
-	  document.querySelector("#startTimeStamp").innerText = new Date(start).toLocaleString();
-	  document.querySelector("#endTimeStamp").innerText = new Date(end).toLocaleString();
-	}
-	setInterval(setParams, 1200);
-	async function areDepositedPreSaleTokens() {
-	  const value = document.querySelector(
-		"#form-output-areTokensDeposited-0"
-	  ).innerText;
-	  if (value === "false") {
-		document.getElementById("alertNOTSTARTED").style.display = "block";
-		document.querySelector(".depButtons").style.display = "none";
+	  setTimeout(main, 200);
+	  async function setParams() {
+		const goal = parseInt(
+		  document.querySelector("#form-output-getGoalUsdt-0").innerText
+		);
+		const contribution = parseInt(
+		  document.querySelector("#form-output-getTotalUsdtCollected-0").innerText
+		);
+		const percent = (contribution / goal) * 100;
+		document.querySelector("#iaoa2").style.width = percent +"%";
+		document.querySelector(".tokensPerUsdtRate").innerText =
+		  document.querySelector("#form-output-getTokensPerUsdt-0").innerText;
+		const now = new Date().getTime();
+		const start =
+			  parseInt(
+				document.querySelector("#form-output-getStartTimeStamp-0").innerText
+			  ) * 1000;
+		const end =
+			  parseInt(
+				document.querySelector("#form-output-getEndTimeStamp-0").innerText
+			  ) * 1000;
+		const timeLeft = end - now;
+		const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+		const hours = Math.floor(
+		  (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+		);
+		const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+		document.querySelector(".days").innerHTML = `<p class="days">${days}
+	  </p><p>days</p>`;
+		document.querySelector(".hours").innerHTML = `<p class="hours">${hours}
+	  </p><p>hours</p>`;
+		document.querySelector(".minutes").innerHTML = `<p class="mins">${minutes}
+	  </p><p>mins</p>`;
+		document.querySelector(".seconds").innerHTML = `<p class="secs">${seconds}
+	  </p><p>secs</p>`;
+		document.querySelector("#startTimeStamp").innerText = new Date(start).toLocaleString();
+		document.querySelector("#endTimeStamp").innerText = new Date(end).toLocaleString();
 	  }
-	  else {
-		document.getElementById("alertNOTSTARTED").style.display = "none";
-		document.querySelector(".depButtons").style.display = "block";
+	  setInterval(setParams, 1200);
+	  async function updatePreSaleStatus() {
+		const tokensDepositedValue = document.querySelector("#form-output-areTokensDeposited-0").innerText;
+		const fundingCompleteValue = document.querySelector("#form-output-isFundingComplete-0").innerText;
+		if (fundingCompleteValue === "false") {
+		  if (tokensDepositedValue === "false") {
+			document.querySelector(".alertNOTSTARTED").style.display = "block";
+			document.querySelector("#form-input-contribute-usdtAmount").style.display = "none";
+			document.querySelector(".alertNOTENDED").style.display = "none";
+			document.querySelector(".depButtons").style.display = "none";
+		  }
+		  else {
+			document.querySelector(".alertNOTSTARTED").style.display = "none";
+			document.querySelector("#form-input-contribute-usdtAmount").style.display = "block";
+			document.querySelector(".alertNOTENDED").style.display = "block";
+			document.querySelector(".depButtons").style.display = "flex";
+			document.getElementById("izg068").style.borderLeft = "3px solid #6ebd4a";
+		  }
+		  document.querySelector(".claimButtons").style.display = "none";
+		}
+		else {
+		  document.getElementById("izg068").style.borderLeft = "3px solid #6ebd4a";
+		  document.getElementById("irx6zf").style.borderLeft = "3px solid #6ebd4a";
+		  document.getElementById("irx6rezf").style.borderLeft = "3px solid #6ebd4a";
+		  document.querySelector(".alertNOTSTARTED").style.display = "none";
+		  document.querySelector(".alertNOTENDED").style.display = "none";
+		  document.querySelector(".depButtons").style.display = "none";
+		  document.querySelector("#form-input-contribute-usdtAmount").style.display = "none";
+		  document.querySelector(".claimButtons").style.display = "flex";
+		}
 	  }
-	}
-	setTimeout(areDepositedPreSaleTokens, 1000);
-	async function areFinishedPreSale() {
-	  const value = document.querySelector(
-		"#form-output-areFinishedPreSale-0"
-	  ).innerText;
-	  if (value === "false") {
-		document.getElementById("alertNOTENDED").style.display = "block";
-		document.querySelector(".claimButtons").style.display = "none";
-	  }
-	  else {
-		document.getElementById("alertNOTENDED").style.display = "none";
-		document.querySelector(".claimButtons").style.display = "block";
-	  }
-	}
-	setTimeout(areDepositedPreSaleTokens, 1000);
-  </script>
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-  <title>PresaleContract
-  </title>
-  <div class="wrapper">
-	<div class="container">
-	  <div class="column1">
-		<div class="row">
-		  <div class="companyTitle">
-			<div class="avatar">
-			  <img id="i4wh" alt="Avatar" src="https://www.w3schools.com/w3images/avatar2.png"/>
-			</div>
-			<div class="titleContainer">
-			  <p>Shiba Inu Presale
-			  </p>
-			  <div class="links">
-				<a href="#">LinkedIn</a>
-				<a href="#">GitHub</a>
+	  setTimeout(updatePreSaleStatus, 1000);
+	</script>
+	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+	<title>PresaleContract
+	</title>
+	<div class="wrapper">
+	  <div class="container">
+		<div class="column1">
+		  <div class="row">
+			<div class="companyTitle">
+			  <div class="avatar">
+				<img id="i4wh" alt="Avatar" src="https://www.w3schools.com/w3images/avatar2.png"/>
 			  </div>
-			</div>
-		  </div>
-		  <p>
-			SHIB is a token that aims to bring technologies and major players
-			from external networks into ETH. We have already prepared reputable
-			funds for the launch of our project and are also attracting external
-			investments for those willing to join the new and fast blockchain.
-			<br/>
-			<br/>Our team consists of three individuals: Eugene, Lisa, and
-			Marko. Each person leads their respective part of the work, ensuring
-			that we are always focused on what matters.
-			<br/>
-			<br/>Meme tokens are not just trading assets – they're a family. We
-			believe that our project can create a new large family that will be
-			eager to bring a multitude of enthusiasts and developers into the
-			evolving blockchain space.
-		  </p>
-		</div>
-		<div class="row">
-		  <div class="presaleAddress">
-			<p>Presale Address:
-			</p>
-			<span id="form-output-getPreSaleToken-0" data-form-name="getPreSaleToken" data-field-type="address" class="address">presale address</span>
-		  </div>
-		  <div class="tokenAddress">
-			<p>Token Address:
-			</p>
-			<span id="form-output-getUsdtToken-0" data-form-name="getUsdtToken" data-field-type="address" class="address"> USDT address</span>
-		  </div>
-		</div>
-		<div class="descriptionRow">
-		  <div class="description">
-			<p>Total Supply:
-			</p>
-			<p class="value">2 200 000 000 SHIB
-			</p>
-		  </div>
-		  <div class="description">
-			<p>Tokens For Presale:
-			</p>
-			<span id="form-output-getPreSaleBalance-0" data-form-name="getPreSaleBalance" data-field-type="uint256">0.</span>
-		  </div>
-		  <div class="description">
-			<p>Tokens For Liquidity:
-			</p>
-			<p class="value">23 409 000 SHIB
-			</p>
-		  </div>
-		  <div class="description">
-			<p>Limit per user:
-			</p>
-			<p class="value">200 ETH
-			</p>
-		  </div>
-		  <div class="description">
-			<p>Liquidity Percent:
-			</p>
-			<p class="value">51%
-			</p>
-		  </div>
-		  <div class="descriptionEnd">
-			<p>Current Rate:
-			</p>
-			<p class="value">
-			  1 SHIB =
-			  <em><span id="form-output-getTokensPerUsdt-0" data-form-name="getTokensPerUsdt" data-field-type="uint256">tokensPerUsdt</span></em>
-			  ETH
-			</p>
-		  </div>
-		</div>
-	  </div>
-	  <div class="column2">
-		<div class="depositRow">
-		  <div class="depositContainer">
-			<p>Presale ends in:
-			</p>
-			<div class="timeLeft">
-			  <div class="days">
-				<p class="days">723
+			  <div class="titleContainer">
+				<p>Shiba Inu Presale
 				</p>
-				<p>days
-				</p>
-			  </div>
-			  <div class="hours">
-				<p class="hours">16
-				</p>
-				<p id="in3ma">hours
-				</p>
-			  </div>
-			  <div class="minutes">
-				<p class="mins">38
-				</p>
-				<p>mins
-				</p>
-			  </div>
-			  <div class="seconds">
-				<p class="secs">31
-				</p>
-				<p>secs
-				</p>
-			  </div>
-			</div>
-			<div class="barContainer">
-			  <div class="bar">
-				<div id="iaoa2" class="progress">
+				<div class="links">
+				  <a href="#">LinkedIn</a>
+				  <a href="#">GitHub</a>
 				</div>
 			  </div>
-			  <div class="goal">
-				<span id="form-output-getTotalUsdtCollected-0" data-form-name="getTotalUsdtCollected" data-field-type="uint256">0.</span>
-				<span id="form-output-getGoalUsdt-0" data-form-name="getGoalUsdt" data-field-type="uint256">getGoalUsdt</span>
+			</div>
+			<p>
+			  SHIB is a token that aims to bring technologies and major players
+			  from external networks into ETH. We have already prepared reputable
+			  funds for the launch of our project and are also attracting external
+			  investments for those willing to join the new and fast blockchain.
+			  <br/>
+			  <br/>Our team consists of three individuals: Eugene, Lisa, and
+			  Marko. Each person leads their respective part of the work, ensuring
+			  that we are always focused on what matters.
+			  <br/>
+			  <br/>Meme tokens are not just trading assets – they're a family. We
+			  believe that our project can create a new large family that will be
+			  eager to bring a multitude of enthusiasts and developers into the
+			  evolving blockchain space.
+			</p>
+		  </div>
+		  <div class="row">
+			<div class="presaleAddress">
+			  <p>Presale Contract:
+			  </p>
+			  <span id="form-output-getPreSaleContractAddress-0" data-form-name="getPreSaleContractAddress" data-field-type="address">Contract address</span>
+			</div>
+			<div class="tokenAddress">
+			  <p>Presale Token:
+			  </p>
+			  <span id="form-output-getPreSaleToken-0" data-form-name="getPreSaleToken" data-field-type="address" class="address">Presale Token</span>
+			</div>
+		  </div>
+		  <div class="descriptionRow">
+			<div class="description">
+			  <p>Total Supply:
+			  </p>
+			  <p class="value">2 200 000 000 USDT
+			  </p>
+			</div>
+			<div class="description">
+			  <p>Tokens For Liquidity:
+			  </p>
+			  <p class="value">23 409 000 USDT
+			  </p>
+			</div>
+			<div class="description">
+			  <p>Limit per user:
+			  </p>
+			  <p class="value">200 USDT
+			  </p>
+			</div>
+			<div class="description">
+			  <p>Liquidity Percent:
+			  </p>
+			  <p class="value">51%
+			  </p>
+			</div>
+			<div class="descriptionEnd">
+			  <p>Current Rate:
+			  </p>
+			  <p class="value">
+				1 USDT =
+				<em><span id="form-output-getTokensPerUsdt-0" data-form-name="getTokensPerUsdt" data-field-type="uint256">VALUE</span></em>
+				tokens
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div class="column2">
+		  <div class="depositRow">
+			<div class="depositContainer">
+			  <p>Presale ends in:
+			  </p>
+			  <div class="timeLeft">
+				<div class="days">
+				  <p class="days">723
+				  </p>
+				  <p>days
+				  </p>
+				</div>
+				<div class="hours">
+				  <p class="hours">16
+				  </p>
+				  <p id="in3ma">hours
+				  </p>
+				</div>
+				<div class="minutes">
+				  <p class="mins">38
+				  </p>
+				  <p>mins
+				  </p>
+				</div>
+				<div class="seconds">
+				  <p class="secs">31
+				  </p>
+				  <p>secs
+				  </p>
+				</div>
+			  </div>
+			  <div class="barContainer">
+				<div class="bar">
+				  <div id="iaoa2" class="progress">
+				  </div>
+				</div>
+				<div class="goal">
+				  <em><span id="form-output-getTotalUsdtCollected-0" data-form-name="getTotalUsdtCollected" data-field-type="uint256">0</span> wei</em>
+				  <em><span id="form-output-getGoalUsdt-0" data-form-name="getGoalUsdt" data-field-type="uint256">1</span> wei</em>
+				</div>
+			  </div>
+			  <input id="form-input-contribute-usdtAmount" type="text" placeholder="Enter sum in wei (6 dec)" data-form-name="contribute" data-field-type="uint256" class="form-control"/>
+			  <div class="alertNOTSTARTED">
+				<p id="irl4cs">Presale has not started yet
+				</p>
+			  </div>
+			  <div class="depButtons">
+				<button id="approveButton" type="button" onclick="approve()">Approve</button>
+				<button type="button" data-form-name="contribute" class="deposit">
+				  Deposit
+				</button>
+			  </div>
+			  <div class="alertNOTENDED">
+				<p id="is4lbw">Presale has not ended yet
+				</p>
+			  </div>
+			  <div class="claimButtons">
+				<button type="button" data-form-name="claimTokens" class="claimTokens">
+				  Claim tokens
+				</button>
 			  </div>
 			</div>
-			<input id="form-input-contribute-usdtAmount" type="text" placeholder="0" data-form-name="contribute" data-field-type="uint256" class="form-control"/>
-			<div class="alertNOTSTARTED">
-			  <p id="irl4cs">Presale has not started yet
-			  </p>
-			</div>
-			<div class="depButtons">
-			  <button id="approveButton" type="button" onclick="approve()">Approve</button>
-			  <button type="button" data-form-name="contribute" class="deposit">
-				Deposit
-			  </button>
-			</div>
-			<div class="alertNOTENDED">
-			  <p id="is4lbw">Presale has not ended yet
-			  </p>
-			</div>
-			<div class="claimButtons">
-			  <button type="button" data-form-name="claimTokens" class="claimTokens">
-				Claim tokens
-			  </button>
+		  </div>
+		  <div class="row">
+			<div class="stages">
+			  <div id="izg068" class="stage">
+				<p id="i5pcj7">Pool Start
+				</p>
+				<p id="startTimeStamp">
+				  startTimeStamp
+				</p>
+				<p id="form-output-getStartTimeStamp-0" data-form-name="getStartTimeStamp" data-field-type="uint256">
+				  poolStartUnixTime
+				</p>
+			  </div>
+			  <div id="irx6zf" class="stage">
+				<p id="i1aamx">Pool End
+				</p>
+				<p id="endTimeStamp">
+				  endTimeStamp
+				</p>
+				<p id="form-output-getEndTimeStamp-0" data-form-name="getEndTimeStamp" data-field-type="uint256">
+				  poolEndUnixTime
+				</p>
+			  </div>
+			  <div id="irx6rezf" class="stage">
+				<p id="ijroi5">Claim Tokens
+				</p>
+			  </div>
 			</div>
 		  </div>
-		  <p class="contribution">Your Contribution
-			<em>0</em> USDT
-		  </p>
-		</div>
-		<div class="row">
-		  <div class="stages">
-			<div id="izg068" class="stage">
-			  <p id="i5pcj7">Pool Start
+		  <div class="row">
+			<div class="currentRate">
+			  <p>Current Rate:
 			  </p>
-			  <p id="startTimeStamp">
-				startTimeStamp
-			  </p>
-			  <p id="form-output-getStartTimeStamp-0" data-form-name="getStartTimeStamp" data-field-type="uint256">
-				poolStartUnixTime
-			  </p>
-			</div>
-			<div id="irx6zf" class="stage">
-			  <p id="i1aamx">Pool End
-			  </p>
-			  <p id="endTimeStamp">
-				endTimeStamp
-			  </p>
-			  <p id="form-output-getEndTimeStamp-0" data-form-name="getEndTimeStamp" data-field-type="uint256">
-				poolEndUnixTime
-			  </p>
-			</div>
-			<div class="stage">
-			  <p id="ijroi5">Claim Tokens
+			  <p class="value">
+				1 USDT =
+				<em><span data-form-name="getTokensPerUsdt" data-field-type="uint256" class="tokensPerUsdtRate">VALUE</span></em>
+				tokens
 			  </p>
 			</div>
 		  </div>
+		  <form id="form-isFundingComplete" class="autoreq">
+			<button type="button" data-form-name="isFundingComplete" class="btn btn-primary mt-2">
+			  isFundingComplete
+			</button>
+		  </form>
+		  <span id="form-output-isFundingComplete-0" data-form-name="isFundingComplete" data-field-type="bool">false</span>
+		  <form id="form-getPreSaleContractAddress" class="autoreq">
+			<button type="button" data-form-name="getPreSaleContractAddress" class="btn btn-primary mt-2">
+			  GetPresaleContractAdress
+			</button>
+		  </form>
+		  <span id="form-output-getUsdtToken-0" data-form-name="getUsdtToken" data-field-type="address">getUsdtToken</span>
+		  <form id="form-getUsdtToken" class="autoreq">
+			<button type="button" data-form-name="getUsdtToken" class="btn btn-primary mt-2">
+			  getusdttokenADDRESS
+			</button>
+		  </form>
+		  <form id="form-getPreSaleToken" class="autoreq">
+			<button type="button" data-form-name="getPreSaleToken" class="btn btn-primary mt-2"><p id="id8cfh">getpresaletokenADDRESS
+			  </p></button>
+		  </form>
+		  <form id="form-getTokensPerUsdt" class="autoreq">
+			<button type="button" data-form-name="getTokensPerUsdt" class="btn btn-primary mt-2"><span id="ilhzrl">getTokensPerUsdt</span><br/></button>
+		  </form>
+		  <form id="form-getStartTimeStamp" class="autoreq">
+			<button type="button" data-form-name="getStartTimeStamp" class="btn btn-primary mt-2">
+			  getStartTimeStamp
+			</button>
+		  </form>
+		  <form id="form-getEndTimeStamp" class="autoreq">
+			<button type="button" data-form-name="getEndTimeStamp" class="btn btn-primary mt-2">
+			  getEndTimeStamp
+			</button>
+		  </form>
+		  <form id="form-getGoalUsdt" class="autoreq">
+			<button type="button" data-form-name="getGoalUsdt" class="btn btn-primary mt-2">
+			  getGoalUsdt
+			</button>
+		  </form>
+		  <form id="form-areTokensDeposited" class="autoreq">
+			<button type="button" data-form-name="areTokensDeposited" class="btn btn-primary mt-2">
+			  areTokensDeposited
+			</button>
+		  </form>
+		  <form id="form-getPreSaleBalance" class="autoreq">
+			<button type="button" data-form-name="getPreSaleBalance" class="btn btn-primary mt-2">
+			  getPreSaleBalance
+			</button>
+		  </form>
+		  <form id="form-getTotalUsdtCollected" class="autoreq">
+			<button type="button" data-form-name="getTotalUsdtCollected" class="btn btn-primary mt-2">
+			  getTotalUsdtCollected
+			</button>
+		  </form>
+		  <span id="form-output-areTokensDeposited-0" data-form-name="areTokensDeposited" data-field-type="bool" class="areDeposited">false</span>
 		</div>
-		<div class="row">
-		  <div class="currentRate">
-			<p>Current Rate:
-			</p>
-			<p class="value">
-			  1 PreSaleToken =
-			  <em><span data-form-name="getTokensPerUsdt" data-field-type="uint256" class="tokensPerUsdtRate">tokensPerUsdt</span></em>
-			  USDT
-			</p>
-		  </div>
-		</div>
-		<form id="form-getUsdtToken" class="autoreq">
-		  <button type="button" data-form-name="getUsdtToken" class="btn btn-primary mt-2">
-			getusdttokenADDRESS
-		  </button>
-		</form>
-		<form id="form-getPreSaleToken" class="autoreq">
-		  <button type="button" data-form-name="getPreSaleToken" class="btn btn-primary mt-2"><p id="id8cfh">getpresaletokenADDRESS
-			</p></button>
-		</form>
-		<form id="form-getTokensPerUsdt" class="autoreq">
-		  <button type="button" data-form-name="getTokensPerUsdt" class="btn btn-primary mt-2"><span id="ilhzrl">getTokensPerUsdt</span><br/></button>
-		</form>
-		<form id="form-getStartTimeStamp" class="autoreq">
-		  <button type="button" data-form-name="getStartTimeStamp" class="btn btn-primary mt-2">
-			getStartTimeStamp
-		  </button>
-		</form>
-		<form id="form-getEndTimeStamp" class="autoreq">
-		  <button type="button" data-form-name="getEndTimeStamp" class="btn btn-primary mt-2">
-			getEndTimeStamp
-		  </button>
-		</form>
-		<form id="form-getGoalUsdt" class="autoreq">
-		  <button type="button" data-form-name="getGoalUsdt" class="btn btn-primary mt-2">
-			getGoalUsdt
-		  </button>
-		</form>
-		<form id="form-areTokensDeposited" class="autoreq">
-		  <button type="button" data-form-name="areTokensDeposited" class="btn btn-primary mt-2">
-			areTokensDeposited
-		  </button>
-		</form>
-		<form id="form-getPreSaleBalance" class="autoreq">
-		  <button type="button" data-form-name="getPreSaleBalance" class="btn btn-primary mt-2">getPreSaleBalance</button>
-		</form>
-		<form id="form-getTotalUsdtCollected" class="autoreq">
-		  <button type="button" data-form-name="getTotalUsdtCollected" class="btn btn-primary mt-2">
-			getTotalUsdtCollectede
-		  </button>
-		</form>
-		<form id="form-getTotalUsdtCollected-2" class="autoreq">
-		  <button type="button" data-form-name="areTokensDeposited" class="btn btn-primary mt-2">
-			Read
-		  </button>
-		</form>
-		<span id="form-output-areTokensDeposited-0" data-form-name="areTokensDeposited" data-field-type="bool" class="areDeposited">false</span>
 	  </div>
 	</div>
-  </div>
-</body>
+  </body>

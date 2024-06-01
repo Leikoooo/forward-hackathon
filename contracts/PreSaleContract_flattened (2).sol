@@ -231,12 +231,10 @@ contract PreSaleContract is Ownable {
     uint256 private endTimeStamp; // End time of the funding (UNIX timestamp)
     uint256 private goalUsdt; // Goal in USDT
     uint256 private totalUsdtCollected; 
-    uint256 private tokensCollected; 
     uint256 private tokensPerUsdt;
 
     bool private fundingComplete; // Flag indicating the funding is complete
     bool private tokensDeposited; // Flag indicating the preSale tokens are deposited
-
 
     mapping(address => uint256) private contributions; // Mapping of user contributions
 
@@ -283,11 +281,13 @@ contract PreSaleContract is Ownable {
         require(fundingComplete, "Funding not complete");
         require(contributions[msg.sender] > 0, "No contribution made");
 
-        uint256 tokensToClaim = (contributions[msg.sender] * tokensCollected) / totalUsdtCollected;
+        uint256 totalTokens = preSaleToken.balanceOf(address(this));
+        uint256 tokensToClaim = (contributions[msg.sender] * totalTokens) / totalUsdtCollected;
 
         contributions[msg.sender] = 0; 
         require(preSaleToken.transfer(msg.sender, tokensToClaim), "Failed to transfer tokens");
     }
+
 
     // Function to deposit preSale tokens to the contract
     function depositPreSaleTokens(uint256 tokenAmount) public onlyOwner {
@@ -295,7 +295,6 @@ contract PreSaleContract is Ownable {
         require(preSaleToken.transferFrom(msg.sender, address(this), tokenAmount), "Token transfer failed");
 
         tokensDeposited = true;
-        tokensCollected = tokenAmount;
 
         // Convert goalUsdt to 18 decimals
         uint256 goalUsdt18Decimals = goalUsdt * 1e12;
